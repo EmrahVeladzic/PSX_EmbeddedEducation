@@ -1,0 +1,13 @@
+# ninja log v7
+30	54	7763706617322058	CMakeFiles/common.dir/src/libc/clz.s.obj	d9463dac82e9a7d8
+40	63	7763706617458768	CMakeFiles/common.dir/src/libc/setjmp.s.obj	7a0604b1e087e54
+44	73	7763706617519357	CMakeFiles/common.dir/src/libc/string.s.obj	324640291ac43838
+34	85	7763706617322058	CMakeFiles/common.dir/src/libc/crt0.c.obj	879f2c4a9e1f7206
+36	90	7763706617458768	CMakeFiles/common.dir/src/libc/malloc.c.obj	dd9db356a89a1106
+39	90	7763706617458768	CMakeFiles/common.dir/src/libc/misc.c.obj	f6d0928e23d2fffd
+29	81	7763722819449908	CMakeFiles/main.dir/src/main.c.obj	d2378343982f0fa7
+42	106	7763706617458768	CMakeFiles/common.dir/src/libc/string.c.obj	7c5e9f12428cb41d
+48	110	7763706617541440	CMakeFiles/common.dir/src/vendor/printf.c.obj	64313618c9ef60cb
+82	123	7763722819976829	main.elf	cea279dfd2ab913c
+25	69	7763723585878938	CMakeFiles/main.dir/src/main.c.obj	d2378343982f0fa7
+70	113	7763723586291643	main.elf	cea279dfd2ab913c
