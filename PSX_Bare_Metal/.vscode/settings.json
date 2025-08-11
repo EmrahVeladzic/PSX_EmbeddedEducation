@@ -1,5 +1,9 @@
 {
     "files.associations": {
-        "registers.h": "c"
-    }
+        "registers.h": "c",
+        "stdint.h": "c",
+        "stdint-gcc.h": "c",
+        "stddef.h": "c"
+    },
+    "C_Cpp.default.compilerPath": "\"C:/g++-mipsel-none-elf-10.3.0/bin/mipsel-none-elf-gcc.exe\""
 }

@@ -14,7 +14,6 @@ file(GLOB commonSrc
     src/libc/*.c
     src/libc/*.s
     src/hardware/*.c
-    src/vendor/*.c
 )
 
 add_library(common OBJECT ${commonSrc})
@@ -24,8 +23,8 @@ target_include_directories(
     src
     src/libc
     src/hardware
-    src/vendor
 )
+
 
 add_executable(main src/main.c)
 

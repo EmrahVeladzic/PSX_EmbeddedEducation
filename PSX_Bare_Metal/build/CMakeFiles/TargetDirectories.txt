@@ -1,4 +1,0 @@
-C:/Users/emrah/Desktop/PSX_Bare_Metal/build/CMakeFiles/common.dir
-C:/Users/emrah/Desktop/PSX_Bare_Metal/build/CMakeFiles/main.dir
-C:/Users/emrah/Desktop/PSX_Bare_Metal/build/CMakeFiles/edit_cache.dir
-C:/Users/emrah/Desktop/PSX_Bare_Metal/build/CMakeFiles/rebuild_cache.dir

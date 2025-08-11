@@ -9,6 +9,8 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 find_program(
     gccPath
         mipsel-none-elf-gcc

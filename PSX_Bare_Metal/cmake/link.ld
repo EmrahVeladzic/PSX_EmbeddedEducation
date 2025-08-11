@@ -1,5 +1,6 @@
 ENTRY(_start)
 
+STACK_SIZE = 0x4000;
 
 MEMORY{
 
@@ -7,80 +8,73 @@ MEMORY{
 
 }
 
-SECTIONS {
+SECTIONS{
+    
     .text : {
-        . = ALIGN(4);
+ 
         _textStart = .;
-        *(.text .text.*)
-        *(.gnu.linkonce.t.*)
-        *(.mips16.fn.*)
-        *(.mips16.call.*)
+
+        *(.text .text.* .gnu.linkonce.t.*)
+        *(.plt)
         *(.MIPS.stubs)
+        
         _textEnd = .;
+
+    } > MAIN_RAM  
+       
+
+    .rodata : {
+
+        _rodataStart = .;
+
+        *(.rodata .rodata.* .gnu.linkonce.r.*)
+
+        _rodataEnd = .;
+
     } > MAIN_RAM
 
     .data : {
-        . = ALIGN(4);
-        _dataStart = .;
-        *(.data .data.*)
-        *(.gnu.linkonce.d.*)
-        _dataEnd = .;
-    } > MAIN_RAM
-    
-    .rodata : {
-        . = ALIGN(4);
-        _rodataStart = .;
-        *(.rodata .rodata.*)
-        *(.gnu.linkonce.r.*)
-        _rodataEnd = .;
-    } > MAIN_RAM
 
-    .sdata : {
-        . = ALIGN(4);
-        _sdataStart = .;
-        *(.sdata .sdata.*)
-        *(.gnu.linkonce.s.*)
-        _sdataEnd = .;
+        _dataStart = .;
+
+        *(.data .data.* .gnu.linkonce.d.*)
+
+        _dataEnd = .;
+
     } > MAIN_RAM
 
     .bss (NOLOAD) : {
-        . = ALIGN(4);
+
+        . = ALIGN((.!=0)? 4 : 1);
         _bssStart = .;
-        *(.bss .bss.*)
-        *(.gnu.linkonce.b.*)
-        *(COMMON)
+
+        *(.bss .bss.* .gnu.linkonce.b.*)
+        *(.COMMON)
+
+        . = ALIGN((.!=0)? 4 : 1);
         _bssEnd = .;
-    } > MAIN_RAM
-    
-    .sbss (NOLOAD) : {
-        . = ALIGN(4);
-        _sbssStart = .;
-        *(.sbss .sbss.*)
-        *(.gnu.linkonce.sb.*)
-        _sbssEnd = .;
+
     } > MAIN_RAM
 
-    . = ALIGN(16);
-    _gp = ALIGN(16) + 0x7ff0;
+    .dummy (NOLOAD) : {
 
-    .preinit_array : {
-        _preinitArrayStart = .;
-        KEEP(*(.preinit_array*))
-        _preinitArrayEnd = .;
+        _dummyStart = .;
+
+        KEEP(*(.dummy))
+
+        _dummyEnd = .;
+
     } > MAIN_RAM
 
-    .init_array : {
-        _initArrayStart = .;
-        KEEP(*(.init_array*))
-        _initArrayEnd = .;
-    } > MAIN_RAM
+    .stack (NOLOAD) : {
 
-    .fini_array : {
-        _finiArrayStart = .;
-        KEEP(*(.fini_array*))
-        _finiArrayEnd = .;
+        _stackEnd = ORIGIN(MAIN_RAM) + LENGTH(MAIN_RAM);
+        . = _stackEnd - STACK_SIZE;
+        _stackStart = .;
+        . = . + STACK_SIZE;
+
     } > MAIN_RAM
 
     _end = .;
-    
+
 }
