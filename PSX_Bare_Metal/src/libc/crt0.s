@@ -15,7 +15,10 @@ _bss_clear:
     sw		$t2, 0($t0)
     addiu   $t0, $t0, WORD
     blt		$t0, $t1, _bss_clear
-    nop
+    nop    
+
+_proceed:
     
+    jal     initHeap
     jal		main			
 
