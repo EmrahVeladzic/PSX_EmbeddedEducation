@@ -31,9 +31,14 @@ void *malloc(size_t size){
     }
     size_t adjusted_size = ALIGN(size+sizeof(Block),8);    
     Block *current = malloc_head;
-    while (current)
+    while (current) 
     {
-        if(!current->ptr && current->size>=adjusted_size){
+        if(!current->ptr && current->size - (adjusted_size-sizeof(Block))<sizeof(Block)){
+            current->ptr=&current[1];
+            current->size=adjusted_size-sizeof(Block);
+            return current->ptr;
+        }
+        else if(!current->ptr && current->size>=adjusted_size){
             Block *free_space = (Block*)((uintptr_t)current+adjusted_size);
             free_space->size=current->size-adjusted_size;
             free_space->ptr=NULL;
@@ -78,20 +83,24 @@ void free(void *ptr){
     } 
 }
 
+
 void *realloc(void *ptr, size_t size){
-    if(!size||!ptr){
+    if(!size){
         free(ptr);
         return NULL;
+    }
+    if(!ptr){
+        return malloc(size);
     }
     Block *owner = ((Block*)ptr) - 1;
     size_t adjusted_size = ALIGN(size+sizeof(Block),8);    
     Block *new_block;
-    if(owner->size==size){
+    if(owner->size==adjusted_size-sizeof(Block)){
         return ptr;
     }
-    else if(size>owner->size){
+    else if(adjusted_size-sizeof(Block)>owner->size){
         if(owner->next&&!owner->next->ptr&&(owner->size+owner->next->size+sizeof(Block)>=adjusted_size)){
-            new_block = (Block*)((uintptr_t)owner->ptr+adjusted_size);
+            new_block = (Block*)((uintptr_t)owner+adjusted_size-sizeof(Block));
             new_block->size=owner->size+owner->next->size+sizeof(Block)-adjusted_size;
             new_block->ptr=NULL;
             new_block->prev=owner;
@@ -108,14 +117,14 @@ void *realloc(void *ptr, size_t size){
             if(!new_block){
                 return NULL;
             }
-            memcpy(new_block->ptr,owner->ptr,owner->size);
-            free(owner);
+            memcpy(new_block->ptr,owner->ptr,size);
+            free(ptr);
             return new_block->ptr;
         }
     }
     else{
-        if(owner->size-adjusted_size>=sizeof(Block)){
-            new_block = (Block*)((uintptr_t)owner->ptr+adjusted_size);
+        if(owner->size-adjusted_size>=0){
+            new_block = (Block*)((uintptr_t)owner+adjusted_size);
             new_block->size=owner->size-adjusted_size;
             new_block->ptr=NULL;
             new_block->next=owner->next;
@@ -132,8 +141,8 @@ void *realloc(void *ptr, size_t size){
             if(!new_block){
                 return NULL;
             }
-            memcpy(new_block->ptr,owner->ptr,new_block->size);
-            free(owner);
+            memcpy(new_block->ptr,owner->ptr,size);
+            free(ptr);
             return new_block->ptr;
         }
     }

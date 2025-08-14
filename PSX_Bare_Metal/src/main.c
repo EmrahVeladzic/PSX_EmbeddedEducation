@@ -2,27 +2,26 @@
 
 int main(){
 
-    int8_t *array = malloc(100);
+    int8_t *array = malloc(48);
 
-    const char *hello = "HelloWorld";
-    const char *HELLOU = "HELLO";
-
-    for (size_t i = 0; i < 100; i++)
-    {
-       array[i]=hello[i%10];
-    }     
-  
-    realloc(array,10);
+    const char *A = "AAAAA";
+    const char *B = "BBBBB";  
     
-    int8_t *brray = malloc(50);
+    int8_t *brray = malloc(48);
 
-
-
-    for (size_t i = 0; i < 50; i++)
+    for (size_t i = 0; i < 48; i++)
     {
-        brray[i]=HELLOU[i%5];
+        brray[i]=B[0];
     }
 
+    free(brray);
+
+    realloc(array,104);
+  
+    for (size_t i = 0; i < 104; i++)
+    {
+       array[i]=A[0];
+    }  
 
 
     while (1) {
