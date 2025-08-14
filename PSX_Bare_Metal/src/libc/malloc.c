@@ -5,136 +5,138 @@
 extern uint8_t _bssEnd[];
 extern uint8_t _stackStart[];
 
-#define HEAP_START (uintptr_t)&_bssEnd
-#define HEAP_LIMIT (uintptr_t)&_stackStart
+#define HEAP_START (uintptr_t)_bssEnd
+#define HEAP_LIMIT (uintptr_t)_stackStart
 
-typedef struct _Block
-{
-    struct _Block *next;
+typedef struct _Block {
+	struct _Block *next;
     struct _Block *prev;
-    void *ptr;
-    size_t size;     
+	void   *ptr;
+	size_t size;
 }Block;
 
-Block *malloc_head;
-Block *malloc_tail;
+static Block* malloc_head;
 
 void initHeap(){
-    malloc_head = (Block*)(HEAP_START);
-    malloc_tail = (Block*)(HEAP_LIMIT-sizeof(Block));
-
-    malloc_head->next=malloc_tail;
-    malloc_head->prev=NULL;
-
-    malloc_tail->next=NULL;
-    malloc_tail->prev=malloc_head;
-
+    malloc_head = (Block*)ALIGN(HEAP_START,8);
     malloc_head->ptr=NULL;
-    malloc_tail->ptr=NULL;
-
-    malloc_head->size=(HEAP_LIMIT-HEAP_START-(2*sizeof(Block)));
-    malloc_tail->size=0;    
+    malloc_head->next=NULL;
+    malloc_head->prev=NULL;
+    malloc_head->size=ALIGN(HEAP_LIMIT-(uintptr_t)&malloc_head[1],8);
 }
 
-void *malloc(size_t size){
-    if(size==0){
+void *malloc(size_t size){   
+    if(!size){
         return NULL;
     }
-    size_t adjusted_size = size + sizeof(Block);
+    size_t adjusted_size = ALIGN(size+sizeof(Block),8);    
     Block *current = malloc_head;
-    while (current!=malloc_tail){
-        if(current->ptr==NULL&&current->size>=adjusted_size){
-            Block *newBlock = (Block*)((uintptr_t)current->next-adjusted_size);
-            newBlock->ptr = (void*)((uintptr_t)newBlock+sizeof(Block));
-            
-            current->size-=adjusted_size;
-            newBlock->size=size;
-           
-            newBlock->next=current->next;
-            newBlock->prev=current;
-           
-            newBlock->next->prev=newBlock;
-            newBlock->prev->next=newBlock;
-            return newBlock->ptr;
+    while (current)
+    {
+        if(!current->ptr && current->size>=adjusted_size){
+            Block *free_space = (Block*)((uintptr_t)current+adjusted_size);
+            free_space->size=current->size-adjusted_size;
+            free_space->ptr=NULL;
+            free_space->next=current->next;
+            current->ptr=&current[1];
+            current->size=adjusted_size-sizeof(Block);
+            current->next = free_space;
+            free_space->prev = current;
+            return current->ptr;
         }
         current=current->next;
-    }       
+    }
     return NULL;
 }
 
 void free(void *ptr){
-    if((uintptr_t)ptr<=(uintptr_t)malloc_head||(uintptr_t)ptr>=(uintptr_t)malloc_tail){
-        return;
+    if(!ptr){
+        return;   
     }
-    Block *owner = (Block*)((uintptr_t)ptr-sizeof(Block));
+    Block *owner = ((Block*)ptr) - 1;
     owner->ptr=NULL;
-    Block *next = owner->next;
-    Block *prev = owner->prev;
-    
-    while (next!=malloc_tail && next->ptr==NULL)
+    Block *eval = owner->next;
+    while (eval && !eval->ptr)
     {
-        owner->size+=(next->size+sizeof(Block));
-        owner->next=next->next;
-        owner->next->prev=owner;
-        next=next->next;
+        owner->next=eval->next;
+        if(owner->next){
+            owner->next->prev=owner;
+        }
+        owner->size+=(eval->size+sizeof(Block));
+        eval=eval->next;
     }
-
-    while (prev!=NULL && prev->ptr==NULL)
-    {
-        prev->size+=(owner->size+sizeof(Block));
-        prev->next=owner->next;
-        owner=prev;
-    }
-    
-    
+    eval=owner->prev;
+    while (eval && !eval->ptr)
+    {   
+        eval->next=owner->next;
+        if(owner->next){
+            owner->next->prev=eval;
+        }
+        eval->size+=(owner->size+sizeof(Block));
+        owner=eval;
+        eval=eval->prev;        
+    } 
 }
 
 void *realloc(void *ptr, size_t size){
-    if(size==0||(uintptr_t)ptr<=(uintptr_t)malloc_head||(uintptr_t)ptr>=(uintptr_t)malloc_tail){
+    if(!size||!ptr){
         free(ptr);
         return NULL;
-    } 
-    size_t adjusted_size = size + sizeof(Block);
-    Block *owner = (Block*)((uintptr_t)ptr-sizeof(Block));
-    if(size<owner->size){
-        void *new_ptr = malloc(size);
-        if(new_ptr!=NULL){
-            memcpy(new_ptr,ptr,size);
-            free(ptr);
-            return new_ptr;
-        }
-        else{
-            new_ptr = (void*)((uintptr_t)owner+(size-owner->size));
-            owner->prev->next = (Block*)new_ptr;
-            owner->next->prev = (Block*)new_ptr;
-            owner->prev->size+=(size-owner->size);
-            owner->size-=(size-owner->size);            
-            return (void*)((uintptr_t)memmove(new_ptr,(void*)owner,adjusted_size)+sizeof(Block));
-        }
+    }
+    Block *owner = ((Block*)ptr) - 1;
+    size_t adjusted_size = ALIGN(size+sizeof(Block),8);    
+    Block *new_block;
+    if(owner->size==size){
+        return ptr;
     }
     else if(size>owner->size){
-        if(owner->prev->ptr==NULL&&owner->prev->size>=(size-owner->size)){
-            owner->prev->size-=(size-owner->size);
-            owner->size+=(size-owner->size);
-            owner->ptr=(void*)((uintptr_t)owner->ptr-(size-owner->size));
-            void *new_ptr = (void*)((uintptr_t)owner->ptr-sizeof(Block)); 
-            owner->prev->next = (Block*)new_ptr;
-            owner->next->prev = (Block*)new_ptr;
-            return (void*)((uintptr_t)memcpy(new_ptr,(void*)owner,adjusted_size)+sizeof(Block));
+        if(owner->next&&!owner->next->ptr&&(owner->size+owner->next->size+sizeof(Block)>=adjusted_size)){
+            new_block = (Block*)((uintptr_t)owner->ptr+adjusted_size);
+            new_block->size=owner->size+owner->next->size+sizeof(Block)-adjusted_size;
+            new_block->ptr=NULL;
+            new_block->prev=owner;
+            new_block->next=owner->next->next;
+            if(new_block->next){
+                new_block->next->prev=new_block;
+            }
+            owner->next=new_block;
+            owner->size=size;
+            return owner->ptr;
         }
         else{
-            void *new_ptr = malloc(size);
-            if(new_ptr==NULL){
+            new_block = malloc(size);
+            if(!new_block){
                 return NULL;
             }
-            memcpy(new_ptr,ptr,owner->size);
-            free(ptr);
-            return new_ptr; 
+            memcpy(new_block->ptr,owner->ptr,owner->size);
+            free(owner);
+            return new_block->ptr;
         }
-    }    
+    }
     else{
-        return ptr;
-    }   
+        if(owner->size-adjusted_size>=sizeof(Block)){
+            new_block = (Block*)((uintptr_t)owner->ptr+adjusted_size);
+            new_block->size=owner->size-adjusted_size;
+            new_block->ptr=NULL;
+            new_block->next=owner->next;
+            if(new_block->next){
+                new_block->next->prev=new_block;
+            }
+            new_block->prev=owner;
+            owner->next=new_block;
+            owner->size=size;
+            return owner->ptr;
+        }
+        else{
+            new_block = malloc(size);
+            if(!new_block){
+                return NULL;
+            }
+            memcpy(new_block->ptr,owner->ptr,new_block->size);
+            free(owner);
+            return new_block->ptr;
+        }
+    }
 }
 
 void *memcpy(void* dest, const void* src, size_t len){
