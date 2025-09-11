@@ -43,6 +43,29 @@ SECTIONS{
 
     } > MAIN_RAM
 
+    .sdata : {
+
+        _sdataStart = .;
+
+        _gp = ALIGN(16) + 0x7ff0;
+        *(.sdata .sdata.* .gnu.linkonce.s.*)
+
+        _sdataEnd = .;
+
+    } > MAIN_RAM
+
+    .sbss (NOLOAD) : {
+
+        . = ALIGN((.!=0)? 4 : 1);
+        _sbssStart = .;
+
+        *(.sbss .sbss.* .gnu.linkonce.sb.*)
+        *(.scommon)
+
+        _sbssEnd = .;
+
+    } > MAIN_RAM
+
     .bss (NOLOAD) : {
 
         . = ALIGN((.!=0)? 4 : 1);

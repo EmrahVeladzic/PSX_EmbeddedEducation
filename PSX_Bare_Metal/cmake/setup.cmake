@@ -34,8 +34,9 @@ target_compile_options(
         -mno-mt
         -mno-llsc
         -mno-abicalls
-        -mno-gpopt
+        -mgpopt
         -mno-extern-sdata
+        -G8
 
 )
 
@@ -45,7 +46,8 @@ target_link_options(
         -static
         -nostdlib
         -Wl,-gc-sections
-        -mno-gpopt
+        -mgpopt
+        -G8
         "-T${CMAKE_CURRENT_LIST_DIR}/link.ld"
 
 )
