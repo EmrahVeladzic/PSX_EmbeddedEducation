@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+
 int main(){
 
     int8_t *array = malloc(48);
@@ -13,12 +14,8 @@ int main(){
     {
         brray[i]=B[0];
     }
-
-    free(brray);
-
-    realloc(array,104);
   
-    for (size_t i = 0; i < 104; i++)
+    for (size_t i = 0; i < 48; i++)
     {
        array[i]=A[0];
     }  

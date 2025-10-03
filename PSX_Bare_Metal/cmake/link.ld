@@ -4,15 +4,24 @@ STACK_SIZE = 0x4000;
 
 MEMORY{
 
+    KERNEL_RAM(rwx):ORIGIN = 0x80000000 LENGTH = 0x10000
     MAIN_RAM(rwx):ORIGIN = 0x80010000 LENGTH = 0x1f0000
 
 }
 
 SECTIONS{
     
+    .ktext 0x80000080 : {
+
+        _ktextStart = .;
+        KEEP(*(.ktext))
+        _ktextEnd = .;
+
+    } > KERNEL_RAM
+
     .text : {
  
-        _textStart = .;
+        _textStart = 0x80010000;
 
         *(.text .text.* .gnu.linkonce.t.*)
         *(.plt)

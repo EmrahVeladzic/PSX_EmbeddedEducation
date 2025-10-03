@@ -4,7 +4,7 @@
 .text
 
 _start:
-
+    
     la      $gp, _gp
     la      $sp, _stackEnd
     la		$t0, _bssStart
@@ -29,6 +29,28 @@ _sbss_clear:
 
 _proceed:
     
+    jal     init_cdrom
+    nop
     jal     initHeap
-    jal		main			
+    nop
 
+    lui    $t0, 0x5000
+    ori    $t0, $t0, 0xFF01   
+    mtc0   $t0, $12
+    nop
+
+    lui    $t0, 0x1F80
+    ori    $t0, $t0, 0x1074
+    li     $t1, 0x03FF
+    sw     $t1,0($t0)
+
+    #mfc0    $t0, $13      
+    #nop
+    #ori     $t0, $t0, 0x100   
+    #mtc0    $t0, $13
+    #nop
+
+    jal		main			
+    nop
+   
+ 

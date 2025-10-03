@@ -32,7 +32,10 @@
             "compilerPath": "\"C:/g++-mipsel-none-elf-10.3.0/bin/mipsel-none-elf-gcc.exe\"",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x86"
+            "intelliSenseMode": "gcc-x86",
+            "compileCommands": [
+                "${workspaceFolder}/build/compile_commands.json"
+            ]
         }
     ],
     "version": 4

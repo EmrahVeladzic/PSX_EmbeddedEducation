@@ -14,7 +14,10 @@ file(GLOB commonSrc
     src/libc/*.c
     src/libc/*.s
     src/hardware/*.c
+    src/hardware/*.s
 )
+
+
 
 add_library(common OBJECT ${commonSrc})
 
