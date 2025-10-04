@@ -7,8 +7,6 @@ int main(){
 
     int8_t *array = malloc(48);
 
-   
-
     exit_crit_section();
 
     const char *A = "AAAAA";
@@ -31,7 +29,7 @@ int main(){
     exit_crit_section();
 
     while (1) {
-        exit_crit_section();
+       
 
     }
 

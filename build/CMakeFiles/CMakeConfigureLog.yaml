@@ -3105,3 +3105,95 @@ events:
         - "C:\\ffmpeg\\bin"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/EmbeddedPSX"
 ...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "cmake/toolchain.cmake:14 (find_program)"
+      - "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/4.1.2/CMakeSystem.cmake:6 (include)"
+      - "CMakeLists.txt:5 (project)"
+    mode: "program"
+    variable: "gccPath"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "mipsel-none-elf-gcc"
+    candidate_directories:
+      - "C:/Users/emrah/AppData/Roaming/mips/mips/bin/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/Microsoft SQL Server/150/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/nodejs/"
+      - "C:/ProgramData/chocolatey/bin/"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/DTS/Binn/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/Microsoft VS Code/bin/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/ffmpeg/bin/"
+      - "C:/Users/emrah/Documents/g++-mipsel-none-elf-15.1.0/bin/"
+      - "C:/Users/emrah/Documents/ninja-win/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Users/emrah/AppData/Local/Programs/Python/Python313/Scripts/"
+      - "C:/Users/emrah/AppData/Local/Programs/Python/Python313/"
+      - "C:/Users/emrah/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/emrah/.dotnet/tools/"
+      - "C:/Users/emrah/AppData/Roaming/npm/"
+      - "C:/Users/emrah/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/emrah/AppData/Roaming/mips/"
+      - "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/mipsel-unknown-elf-gcc/"
+      - "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/mipsel-linux-gnu-gcc/"
+    searched_directories:
+      - "C:/Users/emrah/AppData/Roaming/mips/mips/bin/mipsel-none-elf-gcc.com"
+    found: "C:/Users/emrah/AppData/Roaming/mips/mips/bin/mipsel-none-elf-gcc.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Users\\emrah\\AppData\\Roaming\\mips\\mips\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\150\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\ProgramData\\chocolatey\\bin"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\Microsoft VS Code\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\ffmpeg\\bin"
+        - "C:\\Users\\emrah\\Documents\\g++-mipsel-none-elf-15.1.0\\bin"
+        - "C:\\Users\\emrah\\Documents\\ninja-win"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Users\\emrah\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\"
+        - "C:\\Users\\emrah\\AppData\\Local\\Programs\\Python\\Python313\\"
+        - "C:\\Users\\emrah\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\emrah\\.dotnet\\tools"
+        - "C:\\Users\\emrah\\AppData\\Roaming\\npm"
+        - "C:\\Users\\emrah\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\emrah\\AppData\\Roaming\\mips"
+        - "C:\\Users\\emrah\\AppData\\Roaming\\mips/mips\\bin"
+        - "C:\\Users\\emrah\\.dotnet\\tools"
+        - "C:\\Users\\emrah\\Documents\\g++-mipsel-none-elf-15.1.0\\bin"
+        - "C:\\ffmpeg\\bin"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/EmbeddedPSX"
+...

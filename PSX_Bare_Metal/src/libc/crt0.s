@@ -1,3 +1,4 @@
+.set noreorder
 .globl _start
 .set WORD, 4
 
@@ -17,23 +18,23 @@ _bss_clear:
 
     sw		$t4, 0($t0)
     addiu   $t0, $t0, WORD
-    bltu		$t0, $t1, _bss_clear
+    bltu	$t0, $t1, _bss_clear
     nop    
 
 _sbss_clear:
 
     sw		$t4, 0($t2)
     addiu   $t2, $t2, WORD
-    bltu		$t2, $t3, _sbss_clear
+    bltu	$t2, $t3, _sbss_clear
     nop
 
 _proceed:
     
-    jal     init_cdrom
+    jal    init_cdrom
     nop
 
     lui    $t0, 0x5000
-    ori    $t0, $t0, 0xFF01   
+    ori    $t0, $t0, 0xFF0F   
     mtc0   $t0, $12
     nop
 
@@ -41,12 +42,6 @@ _proceed:
     ori    $t0, $t0, 0x1074
     li     $t1, 0x03FF
     sw     $t1,0($t0)
-
-    #mfc0    $t0, $13      
-    #nop
-    #ori     $t0, $t0, 0x100   
-    #mtc0    $t0, $13
-    #nop
 
     jal		main			
     nop

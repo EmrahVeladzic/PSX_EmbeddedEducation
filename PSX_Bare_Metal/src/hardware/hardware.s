@@ -1,3 +1,4 @@
+.set noreorder
 .text
 
 .globl cdrom_interrupt
@@ -12,13 +13,24 @@ vblank_interrupt:
     andi   $t1, $t1, 0xFFFE
     sw     $t1, 0($t0)
 
-    b generic_irq_test
+    j generic_irq_test
+    nop
+    jr  $ra
     nop
 
 
 cdrom_interrupt:
 
+    lui    $t0, 0x1F80
+    ori    $t0, $t0, 0x1070
+    lw     $t1, 0($t0)
+    andi   $t1, $t1, 0xFFFE
+    sw     $t1, 0($t0)
 
+    j generic_irq_test
+    nop
+    jr  $ra
+    nop
 
 init_cdrom:
 

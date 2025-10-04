@@ -17,5 +17,6 @@ void generic_irq_test(){
         
     }
 
+    free(p);
 
 }
