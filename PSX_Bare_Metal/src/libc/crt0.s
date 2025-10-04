@@ -40,7 +40,7 @@ _proceed:
 
     lui    $t0, 0x1F80
     ori    $t0, $t0, 0x1074
-    li     $t1, 0x03FF
+    li     $t1, 0x03FE
     sw     $t1,0($t0)
 
     jal		main			

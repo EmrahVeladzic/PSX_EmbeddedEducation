@@ -3,16 +3,22 @@
 
 int main(){
 
+    //Disable interrupts
     enter_crit_section();
 
     int8_t *array = malloc(48);
 
-    exit_crit_section();
+    
 
     const char *A = "AAAAA";
     const char *B = "BBBBB";  
 
-    enter_crit_section();
+    //Malloc test, crray is and should be NULL
+    int8_t *crray = malloc(0xFFFFFF);
+    if(crray){
+        exit_crit_section();
+    }
+
     
     int8_t *brray = malloc(48);
 
@@ -26,6 +32,7 @@ int main(){
        array[i]=A[0];
     }  
 
+    //Enable interrupts
     exit_crit_section();
 
     while (1) {
