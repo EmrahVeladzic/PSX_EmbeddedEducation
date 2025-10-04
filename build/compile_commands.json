@@ -1,0 +1,38 @@
+[
+{
+  "directory": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build",
+  "command": "C:\\Users\\emrah\\AppData\\Roaming\\mips\\mips\\bin\\mipsel-none-elf-gcc.exe -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/libc -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/hardware -g -g -Wall -Wa,--strip-local-absolute -ffreestanding -fno-builtin -fno-pic -nostdlib -fdata-sections -ffunction-sections -fsigned-char -fno-strict-overflow -march=r3000 -mabi=32 -mfp32 -mno-mt -mno-llsc -mno-abicalls -mgpopt -mno-extern-sdata -G8 -o CMakeFiles\\common.dir\\src\\hardware\\hardware.s.obj -c C:\\Users\\emrah\\Documents\\GitHub\\PSX_EmbeddedEducation\\PSX_Bare_Metal\\src\\hardware\\hardware.s",
+  "file": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/hardware/hardware.s",
+  "output": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/common.dir/src/hardware/hardware.s.obj"
+},
+{
+  "directory": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build",
+  "command": "C:\\Users\\emrah\\AppData\\Roaming\\mips\\mips\\bin\\mipsel-none-elf-gcc.exe -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/libc -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/hardware -g -g -Wall -Wa,--strip-local-absolute -ffreestanding -fno-builtin -fno-pic -nostdlib -fdata-sections -ffunction-sections -fsigned-char -fno-strict-overflow -march=r3000 -mabi=32 -mfp32 -mno-mt -mno-llsc -mno-abicalls -mgpopt -mno-extern-sdata -G8 -o CMakeFiles\\common.dir\\src\\hardware\\interrupts.c.obj -c C:\\Users\\emrah\\Documents\\GitHub\\PSX_EmbeddedEducation\\PSX_Bare_Metal\\src\\hardware\\interrupts.c",
+  "file": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/hardware/interrupts.c",
+  "output": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/common.dir/src/hardware/interrupts.c.obj"
+},
+{
+  "directory": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build",
+  "command": "C:\\Users\\emrah\\AppData\\Roaming\\mips\\mips\\bin\\mipsel-none-elf-gcc.exe -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/libc -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/hardware -g -g -Wall -Wa,--strip-local-absolute -ffreestanding -fno-builtin -fno-pic -nostdlib -fdata-sections -ffunction-sections -fsigned-char -fno-strict-overflow -march=r3000 -mabi=32 -mfp32 -mno-mt -mno-llsc -mno-abicalls -mgpopt -mno-extern-sdata -G8 -o CMakeFiles\\common.dir\\src\\libc\\crt0.s.obj -c C:\\Users\\emrah\\Documents\\GitHub\\PSX_EmbeddedEducation\\PSX_Bare_Metal\\src\\libc\\crt0.s",
+  "file": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/libc/crt0.s",
+  "output": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/common.dir/src/libc/crt0.s.obj"
+},
+{
+  "directory": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build",
+  "command": "C:\\Users\\emrah\\AppData\\Roaming\\mips\\mips\\bin\\mipsel-none-elf-gcc.exe -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/libc -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/hardware -g -g -Wall -Wa,--strip-local-absolute -ffreestanding -fno-builtin -fno-pic -nostdlib -fdata-sections -ffunction-sections -fsigned-char -fno-strict-overflow -march=r3000 -mabi=32 -mfp32 -mno-mt -mno-llsc -mno-abicalls -mgpopt -mno-extern-sdata -G8 -o CMakeFiles\\common.dir\\src\\libc\\isr.s.obj -c C:\\Users\\emrah\\Documents\\GitHub\\PSX_EmbeddedEducation\\PSX_Bare_Metal\\src\\libc\\isr.s",
+  "file": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/libc/isr.s",
+  "output": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/common.dir/src/libc/isr.s.obj"
+},
+{
+  "directory": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build",
+  "command": "C:\\Users\\emrah\\AppData\\Roaming\\mips\\mips\\bin\\mipsel-none-elf-gcc.exe -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/libc -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/hardware -g -g -Wall -Wa,--strip-local-absolute -ffreestanding -fno-builtin -fno-pic -nostdlib -fdata-sections -ffunction-sections -fsigned-char -fno-strict-overflow -march=r3000 -mabi=32 -mfp32 -mno-mt -mno-llsc -mno-abicalls -mgpopt -mno-extern-sdata -G8 -o CMakeFiles\\common.dir\\src\\libc\\malloc.c.obj -c C:\\Users\\emrah\\Documents\\GitHub\\PSX_EmbeddedEducation\\PSX_Bare_Metal\\src\\libc\\malloc.c",
+  "file": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/libc/malloc.c",
+  "output": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/common.dir/src/libc/malloc.c.obj"
+},
+{
+  "directory": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build",
+  "command": "C:\\Users\\emrah\\AppData\\Roaming\\mips\\mips\\bin\\mipsel-none-elf-gcc.exe -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/libc -IC:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/hardware -g -g -Wall -Wa,--strip-local-absolute -ffreestanding -fno-builtin -fno-pic -nostdlib -fdata-sections -ffunction-sections -fsigned-char -fno-strict-overflow -march=r3000 -mabi=32 -mfp32 -mno-mt -mno-llsc -mno-abicalls -mgpopt -mno-extern-sdata -G8 -o CMakeFiles\\main.dir\\src\\main.c.obj -c C:\\Users\\emrah\\Documents\\GitHub\\PSX_EmbeddedEducation\\PSX_Bare_Metal\\src\\main.c",
+  "file": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/src/main.c",
+  "output": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/main.dir/src/main.c.obj"
+}
+]

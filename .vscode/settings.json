@@ -1,0 +1,7 @@
+{
+    "cmake.sourceDirectory": "C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal",
+    "C_Cpp.default.intelliSenseMode": "gcc-x86",
+    "[mips]": {
+    "editor.snippetSuggestions": "none"
+}
+}

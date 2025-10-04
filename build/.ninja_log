@@ -1,0 +1,8 @@
+# ninja log v7
+2	62	7812399965847952	CMakeFiles/common.dir/src/hardware/hardware.s.obj	2996a928b8abbe9e
+19	76	7812399966028544	CMakeFiles/common.dir/src/libc/crt0.s.obj	fb93ea52f30ff7e
+27	88	7812399966102023	CMakeFiles/common.dir/src/libc/isr.s.obj	3649c81bcc69e18f
+11	185	7812399965937880	CMakeFiles/common.dir/src/hardware/interrupts.c.obj	241d3ceb3f729da5
+51	189	7812399966332726	CMakeFiles/main.dir/src/main.c.obj	8c9e57040376f972
+40	248	7812399966222177	CMakeFiles/common.dir/src/libc/malloc.c.obj	dbb44b50dc820bc7
+249	350	7812399968324842	main.elf	ab563297193028ac

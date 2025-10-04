@@ -31,8 +31,6 @@ _proceed:
     
     jal     init_cdrom
     nop
-    jal     initHeap
-    nop
 
     lui    $t0, 0x5000
     ori    $t0, $t0, 0xFF01   

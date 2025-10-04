@@ -15,9 +15,9 @@ typedef struct _Block {
 	size_t size;
 }Block;
 
-static Block* malloc_head;
+static Block* malloc_head = NULL;
 
-void initHeap(){
+void init_heap(){
     malloc_head = (Block*)ALIGN(HEAP_START,8);
     malloc_head->ptr=NULL;
     malloc_head->next=NULL;
@@ -26,6 +26,9 @@ void initHeap(){
 }
 
 void *malloc(size_t size){   
+    if(!malloc_head){
+        init_heap();
+    }    
     if(!size){
         return NULL;
     }
@@ -55,6 +58,9 @@ void *malloc(size_t size){
 }
 
 void free(void *ptr){
+    if(!malloc_head){
+        init_heap();
+    } 
     if(!ptr){
         return;   
     }
@@ -85,6 +91,9 @@ void free(void *ptr){
 
 
 void *realloc(void *ptr, size_t size){
+    if(!malloc_head){
+        init_heap();
+    } 
     if(!size){
         free(ptr);
         return NULL;

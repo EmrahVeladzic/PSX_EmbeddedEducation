@@ -1,7 +1,9 @@
 #include <stdlib.h>
-
+#include <critical.h>
 
 int main(){
+
+    enter_crit_section();
 
     int8_t *array = malloc(48);
 
@@ -20,6 +22,7 @@ int main(){
        array[i]=A[0];
     }  
 
+    exit_crit_section();
 
     while (1) {
     }
