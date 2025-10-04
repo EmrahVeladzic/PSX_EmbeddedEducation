@@ -18,10 +18,7 @@ vblank_interrupt:
 
 cdrom_interrupt:
 
-    jal    generic_irq_test
-    nop
-    jr     $ra
-    nop
+
 
 init_cdrom:
 
