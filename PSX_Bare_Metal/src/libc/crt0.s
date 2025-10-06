@@ -30,17 +30,14 @@ _sbss_clear:
 
 _proceed:
     
-    jal    init_cdrom
-    nop
-
     lui    $t0, 0x5000
-    ori    $t0, $t0, 0xFF0F   
+    ori    $t0, $t0, 0xFF03   
     mtc0   $t0, $12
     nop
 
     lui    $t0, 0x1F80
     ori    $t0, $t0, 0x1074
-    li     $t1, 0x03FE
+    li     $t1, 0x07FE
     sw     $t1,0($t0)
 
     jal		main			

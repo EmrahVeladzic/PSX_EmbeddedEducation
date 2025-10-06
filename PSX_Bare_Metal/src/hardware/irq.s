@@ -18,13 +18,12 @@ vblank_interrupt:
     jr  $ra
     nop
 
-
-cdrom_interrupt:
+gpu_interrupt:
 
     lui    $t0, 0x1F80
     ori    $t0, $t0, 0x1070
     lw     $t1, 0($t0)
-    andi   $t1, $t1, 0xFFFE
+    andi   $t1, $t1, 0xFFFD
     sw     $t1, 0($t0)
 
     j generic_irq_test
@@ -32,18 +31,16 @@ cdrom_interrupt:
     jr  $ra
     nop
 
-init_cdrom:
-
-    li     $t1, 1
-    
-    lui    $t0, 0x1F80
-    ori    $t0, $t0, 0x1800
-    sb     $t1, 0($t0)
+cdrom_interrupt:
 
     lui    $t0, 0x1F80
-    ori    $t0, $t0, 0x1802   
-    sb     $t1, 0($t0)        
-    jr     $ra
+    ori    $t0, $t0, 0x1070
+    lw     $t1, 0($t0)
+    andi   $t1, $t1, 0xFFFB
+    sw     $t1, 0($t0)
+
+    j generic_irq_test
     nop
-    
+    jr  $ra
+    nop
 

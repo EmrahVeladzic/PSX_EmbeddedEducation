@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <critical.h>
+#include <hardware.h>
 
 int main(){
 
