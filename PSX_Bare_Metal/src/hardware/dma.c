@@ -1,10 +1,10 @@
 #include <dma.h>
 
-void toggle_dma_channel(DMA_CHANNEL channel, int state){
+void toggle_dma_channel(DMA_CHANNEL channel, uint32_t state){
     if(state){
-        *(volatile int *)DMA_DPCR|=channel;
+        _MMIO32(DMA_DPCR)|=channel;
     }
     else{
-        *(volatile int *)DMA_DPCR&=~(channel);
+       _MMIO32(DMA_DPCR)&=~(channel);
     }
 }
