@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <hardware.h>
 
-int main(){
+int main(void){
 
     //Disable interrupts
     enter_crit_section();

@@ -1,4 +1,5 @@
 #include <dma.h>
+#include <mmio.h>
 
 void toggle_dma_channel(DMA_CHANNEL channel, uint32_t state){
     if(state){

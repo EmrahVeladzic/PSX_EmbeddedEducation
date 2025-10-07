@@ -1,8 +1,6 @@
 #ifndef DMA_H
 #define DMA_H
 
-#include <mmio.h>
-
 typedef enum dma_c{
     DMA_MDEC_I  = 0x8,
     DMA_MDEC_O  = 0x8 << 4,
