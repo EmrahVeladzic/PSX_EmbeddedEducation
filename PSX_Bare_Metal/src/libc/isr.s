@@ -8,7 +8,7 @@ interrupt_vector:
 .text
 interrupt_handler:
 
-    addiu $sp, $sp, -68
+    addiu $sp, $sp, -72
 
     sw $ra,  0($sp)
     sw $v0,  4($sp)
@@ -28,7 +28,6 @@ interrupt_handler:
     sw $t8, 60($sp)
     sw $t9, 64($sp)
 
-
     lui    $a0, 0x1F80
     ori    $a0, $a0, 0x1070
     li     $a1, 0
@@ -42,6 +41,7 @@ interrupt_handler:
     nop
 
 not_vblank: 
+
 
     lui    $a0, 0x1F80
     ori    $a0, $a0, 0x1070
@@ -88,36 +88,11 @@ not_cdrom:
     lw $v1,  8($sp)
     lw $v0,  4($sp)
     lw $ra,  0($sp)
-    addiu $sp, $sp, 68
+    addiu $sp, $sp, 72
 
     mfc0 $k0, $14    
     nop
     jr   $k0
     rfe
 
-
-loop:
-j loop
-nop
-
-.globl enter_crit_section
-.globl exit_crit_section
-enter_crit_section:
-
-    mfc0 $t0,$12
-    nop
-    li   $t1,0xFFFFFFFE
-    and  $t0,$t0,$t1
-    mtc0 $t0,$12
-    nop    
-    jr	$ra   
-
-exit_crit_section:
-
-    mfc0 $t0,$12
-    nop
-    ori  $t0,$t0,0x01
-    mtc0 $t0,$12
-    nop    
-    jr  $ra
 

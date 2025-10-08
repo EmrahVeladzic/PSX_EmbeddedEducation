@@ -37,8 +37,9 @@ _proceed:
 
     lui    $t0, 0x1F80
     ori    $t0, $t0, 0x1074
-    li     $t1, 0x07FE
+    li     $t1, 0x0
     sw     $t1,0($t0)
+
 
     jal		main			
     nop

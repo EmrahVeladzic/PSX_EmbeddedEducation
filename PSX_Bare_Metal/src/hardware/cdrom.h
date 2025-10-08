@@ -86,7 +86,7 @@ typedef enum cd_reg3_w_b1{
     CD_RST_DEC = 0x80
 } CD_HCLRCTL;
 
-typedef enum cd_arg {
+typedef enum cd_reg2_w_b0 {
     CD_ARG_CDDA = 0x01,
     CD_ARG_AUTOPAUSE = 0x02,
     CD_ARG_REPORT = 0x04,
@@ -107,11 +107,7 @@ typedef enum cd_stat_mask{
     CD_STAT_SEEKING = 0x20
 } CD_STATUS_MASK;
 
-
-
-
-
-void cdrom_interrupt(void);
+void cdrom_irq(void);
 
 void cdrom_init(void);
 

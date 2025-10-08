@@ -3,6 +3,6 @@
 
 #include <dma.h>
 #include <cdrom.h>
-#include <critical.h>
+#include <interrupts.h>
 
 #endif

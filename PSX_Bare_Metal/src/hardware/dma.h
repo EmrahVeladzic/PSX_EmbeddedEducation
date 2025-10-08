@@ -1,6 +1,8 @@
 #ifndef DMA_H
 #define DMA_H
 
+#include <stdint.h>
+
 typedef enum dma_c{
     DMA_MDEC_I  = 0x8,
     DMA_MDEC_O  = 0x8 << 4,
@@ -14,6 +16,6 @@ typedef enum dma_c{
 
 #define DMA_DPCR 0x1F8010F0
 
-void toggle_dma_channel(DMA_CHANNEL channel, uint32_t state);
+
 
 #endif
