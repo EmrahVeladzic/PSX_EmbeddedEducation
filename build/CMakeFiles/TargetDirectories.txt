@@ -1,4 +1,0 @@
-C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/common.dir
-C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/main.dir
-C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/edit_cache.dir
-C:/Users/emrah/Documents/GitHub/PSX_EmbeddedEducation/build/CMakeFiles/rebuild_cache.dir
