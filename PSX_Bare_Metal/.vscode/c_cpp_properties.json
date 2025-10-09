@@ -20,7 +20,7 @@
             "name": "Mipsel GCC",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/mipsel/lib/gcc/mipsel-none-elf/15.1.0/include"
+                "C:/mipsel/lib/gcc/mipsel-none-elf/15.2.0/include"
             ],
             "defines": [
                 "_DEBUG",

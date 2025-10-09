@@ -6,7 +6,9 @@
 
 #define I_MASK 0x1F801074
 
+
 typedef enum i_msk{
+    I_MASK_NONE = 0x000,
     I_MASK_VBLANK = 0x001,
     I_MASK_GPU = 0x002,
     I_MASK_CDROM = 0x004,
@@ -24,6 +26,7 @@ typedef enum i_msk{
 void enter_crit_section(void);
 void exit_crit_section(void);
 
+void set_interrupt_channel(INTERRUPT_MASK_CHANNEL channel, int state);
 
 void generic_irq_test(void);
 

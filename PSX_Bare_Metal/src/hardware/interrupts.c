@@ -1,13 +1,30 @@
 #include <interrupts.h>
 
-static INTERRUPT_MASK_CHANNEL FORMER_MASK = I_MASK_ALL;
+static INTERRUPT_MASK_CHANNEL FORMER_MASK = I_MASK_NONE;
 
 void enter_crit_section(void){
-    FORMER_MASK = _MMIO16(I_MASK);
+    FORMER_MASK = _MMIO32(I_MASK);
     MASK_TOGGLE32(I_MASK,I_MASK_ALL,0);
 }
 void exit_crit_section(void){
     MASK_TOGGLE32(I_MASK,FORMER_MASK,1);
+    FORMER_MASK = I_MASK_NONE;
+}
+
+void set_interrupt_channel(INTERRUPT_MASK_CHANNEL channel, int state){
+    state = (state>0)? 1:0;
+    if(FORMER_MASK==I_MASK_NONE){
+        MASK_TOGGLE32(I_MASK,channel,state);
+    }
+    else{
+        if (state)
+        {
+           FORMER_MASK|=channel;
+        }
+        else{
+            FORMER_MASK&=~channel;
+        }        
+    }
 }
 
 

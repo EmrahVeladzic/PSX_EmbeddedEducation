@@ -3,7 +3,7 @@
 
 int main(void){
 
-    MASK_TOGGLE32(I_MASK,I_MASK_VBLANK,1);
+    MASK_TOGGLE32(I_MASK,I_MASK_CDROM,1);
     //Disable interrupts
     enter_crit_section();
 
@@ -16,6 +16,8 @@ int main(void){
 
 
     exit_crit_section();
+
+    cdrom_init();
 
     //TESTING INTERRUPTS - FOR A FEW SECONDS BRRAY WILL NOT APPEAR
     for (size_t i = 0; i < 4800000; i++){
