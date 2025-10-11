@@ -4,7 +4,9 @@
         "stdint.h": "c",
         "stdint-gcc.h": "c",
         "stddef.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "dma.h": "c",
+        "mmio.h": "c"
     },
-    "C_Cpp.default.compilerPath": "\"C:/g++-mipsel-none-elf-10.3.0/bin/mipsel-none-elf-gcc.exe\""
+    "C_Cpp.default.compilerPath": "C:/mipsel/bin/mipsel-none-elf-gcc.exe"
 }

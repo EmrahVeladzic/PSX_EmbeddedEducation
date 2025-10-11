@@ -2,6 +2,9 @@
 #define MMIO_H
 
     #include <stdint.h>
+    #include <stddef.h>
+
+    #define MMIO_BASE = 0xBF801000
 
     #define _ADDR8(input)((volatile uint8_t *)input)
     #define _ADDR16(input)((volatile uint16_t *)input)

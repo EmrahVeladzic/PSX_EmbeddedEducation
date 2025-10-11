@@ -46,7 +46,7 @@ cdrom_interrupt:
     lw     $t1, 0($t0)
     andi   $t1, $t1, 0xFFFB
     sw     $t1, 0($t0)
-    jal cdrom_irq
+    jal generic_irq_test
     nop
     lw     $ra, 0($sp)
     addiu  $sp, $sp, 8

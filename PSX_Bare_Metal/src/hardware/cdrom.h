@@ -13,7 +13,6 @@ typedef enum cd_reg {
 } CD_REGS;
 
 typedef enum cd_reg0_w_xb {
-    CD_R0_BANK_WMASK = 0xFC,
     CD_R0_BANK0 = 0x00,
     CD_R0_BANK1 = 0x01,
     CD_R0_BANK2 = 0x02,
@@ -21,12 +20,12 @@ typedef enum cd_reg0_w_xb {
 } CD_ADDRESS;
 
 typedef enum cd_reg0_r_xb{
-    CD_R0_ADPCM_BUSY = 0x04,
-    CD_R0_PRM_EMPTY = 0x08,
-    CD_R0_PRM_WRDY = 0x10,
-    CD_R0_PRM_RRDY = 0x20,
-    CD_R0_DATA_REQ = 0x40,
-    CD_R0_BUSY = 0x80
+    CD_ADPCM_BUSY = 0x04,
+    CD_PRM_EMPTY = 0x08,
+    CD_PRM_WRDY = 0x10,
+    CD_PRM_RRDY = 0x20,
+    CD_DATA_REQ = 0x40,
+    CD_BUSY = 0x80
 } CD_HSTS;
 
 typedef enum cd_reg1_w_b0 {
@@ -59,6 +58,7 @@ typedef enum cd_reg1_w_b0 {
 } CD_COMMAND;
 
 typedef enum cd_reg3_w_b0 {
+    CD_HCHPCTL_INIT = 0x00,
     CD_BFWR = 0x40,
     CD_BFRD = 0x80
 } CD_HCHPCTL;
@@ -74,7 +74,8 @@ typedef enum cd_reg3_r_b1b3{
 } CD_HINTSTS;
 
 typedef enum cd_reg2_w_b1{
-    CD_INTSTS_WMASK = 0xFC,
+    CD_DISABLE_IRQ = 0x00,
+    CD_ENABLE_IRQ = 0x1F,
     CD_INTSTS0 = 0x01,
     CD_INTSTS1 = 0x02,
     CD_XINTSTS = 0x03
@@ -96,7 +97,7 @@ typedef enum cd_reg2_w_b0 {
     CD_ARG_ADPCM = 0x40,
     CD_ARG_D_SPEED = 0x80,
     CD_ARG_FLUSH = 0x07
-} CD_ARGUMENTS;
+} CD_ARGUMENT;
 
 typedef enum cd_stat_mask{
     CD_STAT_ERR = 0x01,
@@ -107,11 +108,13 @@ typedef enum cd_stat_mask{
     CD_STAT_SEEKING = 0x20
 } CD_STATUS_MASK;
 
+#define WAIT_FOR_CD_RDY while(_MMIO8(CD_REG0)&CD_BUSY){__asm__ volatile("");}
+
 void cdrom_irq(void);
 
 void cdrom_init(void);
 
-
+void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT* argv);
 
 
 #endif

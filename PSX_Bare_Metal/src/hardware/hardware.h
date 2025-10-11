@@ -5,4 +5,8 @@
 #include <cdrom.h>
 #include <interrupts.h>
 
+#define CPU_FREQ 0x204CC00
+
+
+
 #endif
