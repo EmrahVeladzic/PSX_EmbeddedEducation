@@ -22,7 +22,7 @@ static inline void init_heap(){
     malloc_head->ptr=NULL;
     malloc_head->next=NULL;
     malloc_head->prev=NULL;
-    malloc_head->size=ALIGN(HEAP_LIMIT-(uintptr_t)&malloc_head[1],8);
+    malloc_head->size=ALIGN(HEAP_LIMIT-(uintptr_t)malloc_head,8);
 }
 
 void *malloc(size_t size){   
@@ -38,9 +38,9 @@ void *malloc(size_t size){
     Block *current = malloc_head;
     while (current) 
     {
-        if(!current->ptr && current->size - (adjusted_size-sizeof(Block))<sizeof(Block)){
+        if(!current->ptr && current->size>=adjusted_size && current->size - adjusted_size<sizeof(Block)){
             current->ptr=&current[1];
-            current->size=adjusted_size-sizeof(Block);
+            current->size=adjusted_size;
             exit_crit_section();
             return current->ptr;
         }
@@ -49,8 +49,11 @@ void *malloc(size_t size){
             free_space->size=current->size-adjusted_size;
             free_space->ptr=NULL;
             free_space->next=current->next;
+            if(free_space->next){
+                free_space->next->prev=free_space;
+            }
             current->ptr=&current[1];
-            current->size=adjusted_size-sizeof(Block);
+            current->size=adjusted_size;
             current->next = free_space;
             free_space->prev = current;
             exit_crit_section();
@@ -80,7 +83,7 @@ void free(void *ptr){
         if(owner->next){
             owner->next->prev=owner;
         }
-        owner->size+=(eval->size+sizeof(Block));
+        owner->size+=eval->size;
         eval=eval->next;
     }
     eval=owner->prev;
@@ -90,7 +93,7 @@ void free(void *ptr){
         if(owner->next){
             owner->next->prev=eval;
         }
-        eval->size+=(owner->size+sizeof(Block));
+        eval->size+=owner->size;
         owner=eval;
         eval=eval->prev;        
     } 
@@ -115,14 +118,14 @@ void *realloc(void *ptr, size_t size){
     Block *owner = ((Block*)ptr) - 1;
     size_t adjusted_size = ALIGN(size+sizeof(Block),8);    
     Block *new_block;
-    if(owner->size==adjusted_size-sizeof(Block)){
+    if(owner->size==adjusted_size){
         exit_crit_section();
         return ptr;
     }
-    else if(adjusted_size-sizeof(Block)>owner->size){
-        if(owner->next&&!owner->next->ptr&&(owner->size+owner->next->size+sizeof(Block)>=adjusted_size)){
-            new_block = (Block*)((uintptr_t)owner+adjusted_size-sizeof(Block));
-            new_block->size=owner->size+owner->next->size+sizeof(Block)-adjusted_size;
+    else if(adjusted_size>owner->size){
+        if(owner->next&&!owner->next->ptr&&(owner->size+owner->next->size>=adjusted_size)){
+            new_block = (Block*)((uintptr_t)owner+adjusted_size);
+            new_block->size=owner->size+owner->next->size-adjusted_size;
             new_block->ptr=NULL;
             new_block->prev=owner;
             new_block->next=owner->next->next;
@@ -130,7 +133,7 @@ void *realloc(void *ptr, size_t size){
                 new_block->next->prev=new_block;
             }
             owner->next=new_block;
-            owner->size=size;
+            owner->size=adjusted_size;
             exit_crit_section();
             return owner->ptr;
         }
@@ -140,14 +143,14 @@ void *realloc(void *ptr, size_t size){
                 exit_crit_section();
                 return NULL;
             }
-            memcpy(new_block->ptr,owner->ptr,owner->size);
+            memcpy(new_block->ptr,owner->ptr,owner->size-sizeof(Block));
             free(ptr);
             exit_crit_section();
             return new_block->ptr;
         }
     }
     else{
-        if(owner->size>=adjusted_size){
+        if(owner->size>=(adjusted_size+sizeof(Block))){
             new_block = (Block*)((uintptr_t)owner+adjusted_size);
             new_block->size=owner->size-adjusted_size;
             new_block->ptr=NULL;
@@ -157,7 +160,7 @@ void *realloc(void *ptr, size_t size){
             }
             new_block->prev=owner;
             owner->next=new_block;
-            owner->size=size;
+            owner->size=adjusted_size;
             exit_crit_section();
             return owner->ptr;
         }
