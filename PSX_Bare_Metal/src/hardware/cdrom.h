@@ -117,6 +117,7 @@ typedef struct cdrom_queued
 
 }QueuedCDROMCommand;
 
+#define CD_QUEUE_SIZE 16
 
 void cdrom_irq(void);
 

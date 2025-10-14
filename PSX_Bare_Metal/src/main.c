@@ -2,9 +2,9 @@
 #include <hardware.h>
 
 int main(void){
-
+    
     cdrom_init();
-     
+
     int8_t *array = malloc(48);
 
     const char *A = "AAAAA";
@@ -33,7 +33,6 @@ int main(void){
         crray[i]=C[0];
     }
     
-
     while (1) {
        __asm__ volatile("");
 
