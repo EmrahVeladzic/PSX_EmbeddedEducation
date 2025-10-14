@@ -1,5 +1,5 @@
 #include <stdlib.h>
-
+#include <interrupts.h>
 #define ALIGN(addr,N) ((addr + (N-1))&(~(N-1)))
 
 extern uint8_t _bssEnd[];
@@ -17,7 +17,7 @@ typedef struct _Block {
 
 static Block* malloc_head = NULL;
 
-void init_heap(){
+static inline void init_heap(){
     malloc_head = (Block*)ALIGN(HEAP_START,8);
     malloc_head->ptr=NULL;
     malloc_head->next=NULL;
@@ -26,10 +26,12 @@ void init_heap(){
 }
 
 void *malloc(size_t size){   
+    enter_crit_section();
     if(!malloc_head){
         init_heap();
     }    
     if(!size){
+        exit_crit_section();
         return NULL;
     }
     size_t adjusted_size = ALIGN(size+sizeof(Block),8);    
@@ -39,6 +41,7 @@ void *malloc(size_t size){
         if(!current->ptr && current->size - (adjusted_size-sizeof(Block))<sizeof(Block)){
             current->ptr=&current[1];
             current->size=adjusted_size-sizeof(Block);
+            exit_crit_section();
             return current->ptr;
         }
         else if(!current->ptr && current->size>=adjusted_size){
@@ -50,18 +53,22 @@ void *malloc(size_t size){
             current->size=adjusted_size-sizeof(Block);
             current->next = free_space;
             free_space->prev = current;
+            exit_crit_section();
             return current->ptr;
         }
         current=current->next;
     }
+    exit_crit_section();
     return NULL;
 }
 
 void free(void *ptr){
+    enter_crit_section();
     if(!malloc_head){
         init_heap();
     } 
     if(!ptr){
+        exit_crit_section();
         return;   
     }
     Block *owner = ((Block*)ptr) - 1;
@@ -87,24 +94,29 @@ void free(void *ptr){
         owner=eval;
         eval=eval->prev;        
     } 
+    exit_crit_section();
 }
 
 
 void *realloc(void *ptr, size_t size){
+    enter_crit_section();
     if(!malloc_head){
         init_heap();
     } 
     if(!size){
         free(ptr);
+        exit_crit_section();
         return NULL;
     }
     if(!ptr){
+        exit_crit_section();
         return malloc(size);
     }
     Block *owner = ((Block*)ptr) - 1;
     size_t adjusted_size = ALIGN(size+sizeof(Block),8);    
     Block *new_block;
     if(owner->size==adjusted_size-sizeof(Block)){
+        exit_crit_section();
         return ptr;
     }
     else if(adjusted_size-sizeof(Block)>owner->size){
@@ -119,20 +131,23 @@ void *realloc(void *ptr, size_t size){
             }
             owner->next=new_block;
             owner->size=size;
+            exit_crit_section();
             return owner->ptr;
         }
         else{
             new_block = malloc(size);
             if(!new_block){
+                exit_crit_section();
                 return NULL;
             }
-            memcpy(new_block->ptr,owner->ptr,size);
+            memcpy(new_block->ptr,owner->ptr,owner->size);
             free(ptr);
+            exit_crit_section();
             return new_block->ptr;
         }
     }
     else{
-        if(owner->size-adjusted_size>=0){
+        if(owner->size>=adjusted_size){
             new_block = (Block*)((uintptr_t)owner+adjusted_size);
             new_block->size=owner->size-adjusted_size;
             new_block->ptr=NULL;
@@ -143,15 +158,18 @@ void *realloc(void *ptr, size_t size){
             new_block->prev=owner;
             owner->next=new_block;
             owner->size=size;
+            exit_crit_section();
             return owner->ptr;
         }
         else{
             new_block = malloc(size);
             if(!new_block){
+                exit_crit_section();
                 return NULL;
             }
             memcpy(new_block->ptr,owner->ptr,size);
             free(ptr);
+            exit_crit_section();
             return new_block->ptr;
         }
     }

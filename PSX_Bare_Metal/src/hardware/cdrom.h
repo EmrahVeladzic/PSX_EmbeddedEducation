@@ -23,7 +23,7 @@ typedef enum cd_reg0_r_xb{
     CD_ADPCM_BUSY = 0x04,
     CD_PRM_EMPTY = 0x08,
     CD_PRM_WRDY = 0x10,
-    CD_PRM_RRDY = 0x20,
+    CD_RES_RRDY = 0x20,
     CD_DATA_REQ = 0x40,
     CD_BUSY = 0x80
 } CD_HSTS;
@@ -82,7 +82,7 @@ typedef enum cd_reg2_w_b1{
 } CD_HINTMSK;
 
 typedef enum cd_reg3_w_b1{
-    CD_ACK_IRQ = 0x07,
+    CD_ACK_IRQ = 0x1F,
     CD_CLS_P_FIFO = 0x40,
     CD_RST_DEC = 0x80
 } CD_HCLRCTL;
@@ -95,8 +95,7 @@ typedef enum cd_reg2_w_b0 {
     CD_ARG_SIZE2 = 0x10,
     CD_ARG_SIZE = 0x20,
     CD_ARG_ADPCM = 0x40,
-    CD_ARG_D_SPEED = 0x80,
-    CD_ARG_FLUSH = 0x07
+    CD_ARG_D_SPEED = 0x80
 } CD_ARGUMENT;
 
 typedef enum cd_stat_mask{
@@ -108,13 +107,22 @@ typedef enum cd_stat_mask{
     CD_STAT_SEEKING = 0x20
 } CD_STATUS_MASK;
 
-#define WAIT_FOR_CD_RDY while(_MMIO8(CD_REG0)&CD_BUSY){__asm__ volatile("");}
+#define CDROM_RDY (_MMIO8(CD_REG0)&CD_BUSY)
+
+typedef struct cdrom_queued
+{
+    CD_COMMAND cmd;
+    uint8_t argc;
+    CD_ARGUMENT *argv;
+
+}QueuedCDROMCommand;
+
 
 void cdrom_irq(void);
 
 void cdrom_init(void);
 
-void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT* argv);
+void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT *argv);
 
 
 #endif

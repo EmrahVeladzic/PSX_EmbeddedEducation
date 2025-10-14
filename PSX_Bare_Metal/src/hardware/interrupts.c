@@ -27,10 +27,9 @@ void set_interrupt_channel(INTERRUPT_MASK_CHANNEL channel, int state){
     }
 }
 
+static int index = 0;
 
 void generic_irq_test(void){
-
-    static int index = 0;
 
     const char msg[10] ="INTERRUPT\0";
 

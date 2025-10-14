@@ -5,29 +5,16 @@ int main(void){
 
     cdrom_init();
      
-
-    //Disable interrupts
-    enter_crit_section();
-
     int8_t *array = malloc(48);
-
-    
 
     const char *A = "AAAAA";
     const char *B = "BBBBB";  
 
-
-    exit_crit_section();
-
-    cdrom_issue_cmd(CD_CMD_NOP,0,NULL);
-
-    //TESTING INTERRUPTS - FOR A FEW SECONDS BRRAY WILL NOT APPEAR
-    for (size_t i = 0; i < 4800000; i++){
-       array[i%48]=A[0];
+    for (size_t i = 0; i < 48; i++){
+       array[i]=A[0];
     }  
 
-
-    enter_crit_section();  
+    delay_microseconds(10000000);
 
     int8_t *brray = malloc(48);
 
@@ -35,13 +22,6 @@ int main(void){
     {
         brray[i]=B[0];
     }
-
-
-  
-    
-
-    //Enable interrupts
-    exit_crit_section();
 
     while (1) {
        __asm__ volatile("");
