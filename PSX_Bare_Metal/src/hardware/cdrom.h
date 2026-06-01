@@ -5,21 +5,21 @@
 
 #define COM_DELAY 0x1F801020
 
-typedef enum cd_reg {
+typedef enum cd_reg : uintptr_t {
     CD_REG0 = 0x1F801800,
     CD_REG1 = 0x1F801801,
     CD_REG2 = 0x1F801802,
     CD_REG3 = 0x1F801803
 } CD_REGS;
 
-typedef enum cd_reg0_w_xb {
+typedef enum cd_reg0_w_xb : uint8_t {
     CD_R0_BANK0 = 0x00,
     CD_R0_BANK1 = 0x01,
     CD_R0_BANK2 = 0x02,
     CD_R0_BANK3 = 0x03,
 } CD_ADDRESS;
 
-typedef enum cd_reg0_r_xb{
+typedef enum cd_reg0_r_xb : uint8_t{
     CD_ADPCM_BUSY = 0x04,
     CD_PRM_EMPTY = 0x08,
     CD_PRM_WRDY = 0x10,
@@ -28,7 +28,7 @@ typedef enum cd_reg0_r_xb{
     CD_BUSY = 0x80
 } CD_HSTS;
 
-typedef enum cd_reg1_w_b0 {
+typedef enum cd_reg1_w_b0 : uint8_t {
     CD_CMD_NOP = 0x01,
     CD_CMD_SETLOC = 0x02,
     CD_CMD_PLAY = 0x03,
@@ -57,13 +57,13 @@ typedef enum cd_reg1_w_b0 {
     CD_CMD_RESET = 0x1C
 } CD_COMMAND;
 
-typedef enum cd_reg3_w_b0 {
+typedef enum cd_reg3_w_b0 : uint8_t {
     CD_HCHPCTL_INIT = 0x00,
     CD_BFWR = 0x40,
     CD_BFRD = 0x80
 } CD_HCHPCTL;
 
-typedef enum cd_reg3_r_b1b3{
+typedef enum cd_reg3_r_b1b3 : uint8_t {
     CD_INTERRUPT_RMASK = 0x07,
     CD_IRQ_S_NOIRQ = 0x0,
     CD_IRQ_S_DATA_RDY = 0x1,
@@ -73,7 +73,7 @@ typedef enum cd_reg3_r_b1b3{
     CD_IRQ_S_ERR = 0x5
 } CD_HINTSTS;
 
-typedef enum cd_reg2_w_b1{
+typedef enum cd_reg2_w_b1 : uint8_t {
     CD_DISABLE_IRQ = 0x00,
     CD_ENABLE_IRQ = 0x1F,
     CD_INTSTS0 = 0x01,
@@ -81,13 +81,13 @@ typedef enum cd_reg2_w_b1{
     CD_XINTSTS = 0x03
 } CD_HINTMSK;
 
-typedef enum cd_reg3_w_b1{
+typedef enum cd_reg3_w_b1 : uint8_t {
     CD_ACK_IRQ = 0x1F,
     CD_CLS_P_FIFO = 0x40,
     CD_RST_DEC = 0x80
 } CD_HCLRCTL;
 
-typedef enum cd_reg2_w_b0 {
+typedef enum cd_reg2_w_b0 : uint8_t {
     CD_ARG_CDDA = 0x01,
     CD_ARG_AUTOPAUSE = 0x02,
     CD_ARG_REPORT = 0x04,
@@ -98,7 +98,7 @@ typedef enum cd_reg2_w_b0 {
     CD_ARG_D_SPEED = 0x80
 } CD_ARGUMENT;
 
-typedef enum cd_stat_mask{
+typedef enum cd_stat_mask : uint8_t {
     CD_STAT_ERR = 0x01,
     CD_STAT_STANDBY = 0x02,
     CD_STAT_SEEK_ERR = 0x04,
@@ -107,7 +107,12 @@ typedef enum cd_stat_mask{
     CD_STAT_SEEKING = 0x20
 } CD_STATUS_MASK;
 
-#define CDROM_RDY (_MMIO8(CD_REG0)&CD_BUSY)
+#define CDROM_RDY !(_MMIO8(CD_REG0)&CD_BUSY)
+
+#define CDROM_SYNC while (!CDROM_RDY){ __asm__ volatile("");}
+
+#define CDROM_RES_RDY (_MMIO8(CD_REG0) & CD_RES_RRDY)
+
 
 typedef struct cdrom_queued
 {
@@ -119,11 +124,15 @@ typedef struct cdrom_queued
 
 #define CD_QUEUE_SIZE 16
 
+extern volatile bool cdrom_initialized;
+
 void cdrom_irq(void);
 
 void cdrom_init(void);
 
 void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT *argv);
+
+extern uint8_t command_response[16];
 
 
 #endif

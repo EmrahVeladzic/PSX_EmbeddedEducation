@@ -17,8 +17,6 @@ file(GLOB commonSrc
     src/hardware/*.s
 )
 
-
-
 add_library(common OBJECT ${commonSrc})
 
 target_include_directories(

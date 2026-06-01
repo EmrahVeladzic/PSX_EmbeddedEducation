@@ -3,7 +3,7 @@
 
 int main(void){
     
-    cdrom_init();
+   
 
     int8_t *array = malloc(48);
 
@@ -15,7 +15,7 @@ int main(void){
        array[i]=A[0];
     }  
 
-    realloc(array,24);
+    array = realloc(array,24);
 
     delay_microseconds(10000000);
 
@@ -32,9 +32,15 @@ int main(void){
     {
         crray[i]=C[0];
     }
+
+    cdrom_init();
+
+    
     
     while (1) {
        __asm__ volatile("");
+
+       
 
     }
 

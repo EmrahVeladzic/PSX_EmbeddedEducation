@@ -14,8 +14,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_program(
     gccPath
         mipsel-none-elf-gcc
-        mipsel-unknown-elf-gcc
-        mipsel-linux-gnu-gcc
     NO_CACHE
 )
 

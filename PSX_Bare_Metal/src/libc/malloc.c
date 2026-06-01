@@ -108,11 +108,9 @@ void *realloc(void *ptr, size_t size){
     } 
     if(!size){
         free(ptr);
-        exit_crit_section();
         return NULL;
     }
     if(!ptr){
-        exit_crit_section();
         return malloc(size);
     }
     Block *owner = ((Block*)ptr) - 1;

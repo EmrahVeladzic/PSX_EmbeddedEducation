@@ -1,27 +1,11 @@
 {
-    "configurations": [
-        {
-            "name": "Win32",
-            "includePath": [
-                "${workspaceFolder}/**"
-            ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
-            ],
-            "windowsSdkVersion": "10.0.22621.0",
-            "compilerPath": "cl.exe",
-            "cStandard": "c17",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "windows-msvc-x64"
-        },
+    "configurations": [        
         {
             "name": "Mipsel GCC",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/mipsel/lib/gcc/mipsel-none-elf/15.2.0/include",
-                "C:/mipsel/mipsel-none-elf/include"
+                "/home/emrah/mips-toolchain/mipsel-none-elf/include"
+               
             ],
             "defines": [
                 "_DEBUG",
@@ -29,11 +13,11 @@
                 "_UNICODE",
                 "__STDC_HOSTED__=0"               
             ],
-            "compilerPath": "C:/mipsel/bin/mipsel-none-elf-gcc.exe",
-            "cStandard": "c17",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x86",
-            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+            "compilerPath": "/home/emrah/mips-toolchain/bin/mipsel-none-elf-gcc",
+            "cStandard": "c23",
+            
+            "intelliSenseMode": "gcc-arm"
+            
         }
     ],
     "version": 4

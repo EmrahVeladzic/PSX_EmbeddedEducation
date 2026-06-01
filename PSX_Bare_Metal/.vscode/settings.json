@@ -1,4 +1,5 @@
 {
+    "cmake.cmakePath": "/snap/bin/cmake",
     "files.associations": {
         "registers.h": "c",
         "stdint.h": "c",
@@ -8,5 +9,5 @@
         "dma.h": "c",
         "mmio.h": "c"
     },
-    "C_Cpp.default.compilerPath": "C:/mipsel/bin/mipsel-none-elf-gcc.exe"
+    "C_Cpp.default.compilerPath": "/home/emrah/mips-toolchain/bin/mipsel-none-elf-gcc"
 }

@@ -11,7 +11,7 @@ link_libraries(compilation_flags)
 
 target_compile_features(
     compilation_flags INTERFACE
-    c_std_17
+    c_std_23
 )
 
 target_compile_options(
