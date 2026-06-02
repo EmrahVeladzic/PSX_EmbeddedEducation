@@ -70,7 +70,7 @@ typedef enum cd_reg3_r_b1b3 : uint8_t {
     CD_IRQ_S_CMD_FIN = 0x2,
     CD_IRQ_S_ACK = 0x3,
     CD_IRQ_S_EOD = 0x4,
-    CD_IRQ_S_ERR = 0x5
+    CD_IRQ_S_ERR = 0x5    
 } CD_HINTSTS;
 
 typedef enum cd_reg2_w_b1 : uint8_t {
@@ -109,28 +109,15 @@ typedef enum cd_stat_mask : uint8_t {
 
 #define CDROM_RDY !(_MMIO8(CD_REG0)&CD_BUSY)
 
+#define CDROM_RES_RDY (_MMIO8(CD_REG0) & !CD_RES_RRDY)
+
 #define CDROM_SYNC while (!CDROM_RDY){ __asm__ volatile("");}
-
-#define CDROM_RES_RDY (_MMIO8(CD_REG0) & CD_RES_RRDY)
-
-
-typedef struct cdrom_queued
-{
-    CD_COMMAND cmd;
-    uint8_t argc;
-    CD_ARGUMENT *argv;
-
-}QueuedCDROMCommand;
-
-#define CD_QUEUE_SIZE 16
-
-extern volatile bool cdrom_initialized;
 
 void cdrom_irq(void);
 
 void cdrom_init(void);
 
-void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT *argv);
+void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT *argv, CD_HINTSTS expected_response);
 
 extern uint8_t command_response[16];
 

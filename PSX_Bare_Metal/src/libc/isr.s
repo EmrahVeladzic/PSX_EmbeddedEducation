@@ -28,45 +28,35 @@ interrupt_handler:
     sw $t8, 60($sp)
     sw $t9, 64($sp)
 
-    lui    $a0, 0x1F80
-    ori    $a0, $a0, 0x1070
-    li     $a1, 0
-    jal    check_bit_at_addr
-    nop
+    lui  $t0, 0x1F80
+    ori  $t1, $t0, 0x1070
+    lw   $t1, 0($t1)
+    ori  $t2, $t0, 0x1074
+    lw   $t2, 0($t2)
+    and  $t1, $t1, $t2
 
-    beqz   $v0, not_vblank
-    nop
 
-    jal    vblank_interrupt
+    andi $t3, $t1, 0x0001
+    beqz $t3, not_vblank
+    nop
+    jal  vblank_interrupt
     nop
 
 not_vblank: 
 
 
-    lui    $a0, 0x1F80
-    ori    $a0, $a0, 0x1070
-    li     $a1, 1
-    jal    check_bit_at_addr
+    andi $t3, $t1, 0x0002
+    beqz $t3, not_gpu
     nop
-
-    beqz   $v0, not_gpu
-    nop
-
-    jal    gpu_interrupt
+    jal  gpu_interrupt
     nop
 
 not_gpu:
 
-    lui    $a0, 0x1F80
-    ori    $a0, $a0, 0x1070
-    li     $a1, 2
-    jal    check_bit_at_addr
+    andi $t3, $t1, 0x0004
+    beqz $t3, not_cdrom
     nop
-
-    beqz   $v0, not_cdrom
-    nop
-
-    jal    cdrom_interrupt
+    jal  cdrom_interrupt
     nop
 
 not_cdrom:

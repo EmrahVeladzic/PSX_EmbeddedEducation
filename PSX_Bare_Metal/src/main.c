@@ -33,12 +33,23 @@ int main(void){
         crray[i]=C[0];
     }
 
+
+   
     cdrom_init();
 
-    
+    int cmd = 0;
     
     while (1) {
        __asm__ volatile("");
+
+     
+       while (cmd<10)
+       {
+        cdrom_issue_cmd(CD_CMD_PAUSE,0,NULL, CD_IRQ_S_CMD_FIN);
+        
+        cmd++;
+       }
+       
 
        
 
