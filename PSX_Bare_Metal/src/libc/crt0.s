@@ -1,47 +1,78 @@
 .set noreorder
 .globl _start
-.set WORD, 4
+
+.set WORD,       4
+
+.set I_STAT_ADDR,  0x1F801070
+.set I_MASK_ADDR,  0x1F801074
+   
+
+.set SR_RUN,     0x5000FF01
 
 .text
 
 _start:
-    
+
+    lui  $t0, %hi(I_MASK_ADDR)
+    sw   $zero,  %lo(I_MASK_ADDR)($t0)
+
+    mtc0    $zero, $12
+    nop
+
+
     la      $gp, _gp
-    la      $sp, _stackEnd
+    la      $sp, _stackTop
+
     la		$t0, _bssStart
     la      $t1, _bssEnd 
-    la      $t2, _sbssStart
-    la      $t3, _sbssEnd
-    move 	$t4, $zero	
 
 _bss_clear:
 
-    sw		$t4, 0($t0)
+    beq     $t0, $t1, _bss_done
+    nop
+    sw      $zero, 0($t0)
+    nop
     addiu   $t0, $t0, WORD
-    bltu	$t0, $t1, _bss_clear
-    nop    
+    j       _bss_clear
+    nop
 
-_sbss_clear:
+_bss_done:
 
-    sw		$t4, 0($t2)
-    addiu   $t2, $t2, WORD
-    bltu	$t2, $t3, _sbss_clear
+
+    lui  $t0, %hi(I_STAT_ADDR)
+    sw   $zero, %lo(I_STAT_ADDR)($t0)
+
+    la    $t0, _ktextStart
+    la    $t1, _ktextEnd
+    la    $t2, _ktextDest
+
+    beq   $t0, $t1, _vec_copy_done   
+    nop
+
+_vec_copy:
+
+    lw    $t3, 0($t0)
+    nop
+    sw    $t3, 0($t2)
+    addiu $t0, $t0, WORD
+    bne   $t0, $t1, _vec_copy
+    addiu $t2, $t2, WORD
+
+_vec_copy_done:
+
+    jal flush_icache
+    nop
+
+    li    $t0, SR_RUN
+    mtc0  $t0, $12
     nop
 
 _proceed:
-    
-    lui    $t0, 0x5000
-    ori    $t0, $t0, 0xFF03   
-    mtc0   $t0, $12
+
+    jal   main
     nop
 
-    lui    $t0, 0x1F80
-    ori    $t0, $t0, 0x1074
-    li     $t1, 0x0
-    sw     $t1,0($t0)
+_hang:
 
-
-    jal		main			
+    b     _hang
     nop
-   
- 

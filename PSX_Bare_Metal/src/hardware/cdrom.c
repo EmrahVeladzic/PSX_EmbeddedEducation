@@ -86,10 +86,25 @@ void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT* argv, CD_HINTSTS
 void cdrom_irq(void){
   
     read_result(); 
-    
-    char* out = malloc(1);
 
-    out[0]=current_status;
+    const char msg[12] ="INTERRUPT - ";
+    
+    char* out = malloc(16);
+
+    if(out){
+        for (size_t i = 0; i < 12; i++)
+        {
+            out[i]=msg[i];
+        }
+        out[12]=current_status+48;
+        out[13]='\0';
+
+    }
+
+
+   
+
+    free(out);
    
    
 }

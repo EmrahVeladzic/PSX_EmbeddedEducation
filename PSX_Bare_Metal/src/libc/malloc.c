@@ -3,10 +3,10 @@
 #define ALIGN(addr,N) ((addr + (N-1))&(~(N-1)))
 
 extern uint8_t _bssEnd[];
-extern uint8_t _stackStart[];
+extern uint8_t _stackBottom[];
 
 #define HEAP_START (uintptr_t)_bssEnd
-#define HEAP_LIMIT (uintptr_t)_stackStart
+#define HEAP_LIMIT (uintptr_t)_stackBottom
 
 typedef struct _Block {
 	struct _Block *next;
@@ -25,13 +25,12 @@ static inline void init_heap(){
     malloc_head->size=ALIGN(HEAP_LIMIT-(uintptr_t)malloc_head,8);
 }
 
-void *malloc(size_t size){   
-    enter_crit_section();
+static void *_malloc_internal(size_t size){
     if(!malloc_head){
         init_heap();
     }    
     if(!size){
-        exit_crit_section();
+
         return NULL;
     }
     size_t adjusted_size = ALIGN(size+sizeof(Block),8);    
@@ -41,7 +40,7 @@ void *malloc(size_t size){
         if(!current->ptr && current->size>=adjusted_size && current->size - adjusted_size<sizeof(Block)){
             current->ptr=&current[1];
             current->size=adjusted_size;
-            exit_crit_section();
+
             return current->ptr;
         }
         else if(!current->ptr && current->size>=adjusted_size){
@@ -56,22 +55,20 @@ void *malloc(size_t size){
             current->size=adjusted_size;
             current->next = free_space;
             free_space->prev = current;
-            exit_crit_section();
+
             return current->ptr;
         }
         current=current->next;
     }
-    exit_crit_section();
     return NULL;
 }
 
-void free(void *ptr){
-    enter_crit_section();
+static void _free_internal(void *ptr){
     if(!malloc_head){
         init_heap();
     } 
     if(!ptr){
-        exit_crit_section();
+
         return;   
     }
     Block *owner = ((Block*)ptr) - 1;
@@ -97,27 +94,23 @@ void free(void *ptr){
         owner=eval;
         eval=eval->prev;        
     } 
-    exit_crit_section();
 }
 
-
-void *realloc(void *ptr, size_t size){
-    enter_crit_section();
-    if(!malloc_head){
+static void *_realloc_internal(void *ptr, size_t size){
+if(!malloc_head){
         init_heap();
     } 
     if(!size){
-        free(ptr);
+        _free_internal(ptr);
         return NULL;
     }
     if(!ptr){
-        return malloc(size);
+        return _malloc_internal(size);
     }
     Block *owner = ((Block*)ptr) - 1;
     size_t adjusted_size = ALIGN(size+sizeof(Block),8);    
     Block *new_block;
     if(owner->size==adjusted_size){
-        exit_crit_section();
         return ptr;
     }
     else if(adjusted_size>owner->size){
@@ -132,19 +125,14 @@ void *realloc(void *ptr, size_t size){
             }
             owner->next=new_block;
             owner->size=adjusted_size;
-            exit_crit_section();
             return owner->ptr;
         }
         else{
-            new_block = malloc(size);
-            if(!new_block){
-                exit_crit_section();
-                return NULL;
-            }
-            memcpy(new_block->ptr,owner->ptr,owner->size-sizeof(Block));
-            free(ptr);
-            exit_crit_section();
-            return new_block->ptr;
+            void *new_ptr = _malloc_internal(size);
+            if(!new_ptr) return NULL;
+            memcpy(new_ptr, owner->ptr, owner->size-sizeof(Block));
+            _free_internal(ptr);
+            return new_ptr;
         }
     }
     else{
@@ -159,21 +147,37 @@ void *realloc(void *ptr, size_t size){
             new_block->prev=owner;
             owner->next=new_block;
             owner->size=adjusted_size;
-            exit_crit_section();
             return owner->ptr;
         }
         else{
-            new_block = malloc(size);
-            if(!new_block){
-                exit_crit_section();
-                return NULL;
-            }
-            memcpy(new_block->ptr,owner->ptr,size);
-            free(ptr);
-            exit_crit_section();
-            return new_block->ptr;
+            void *new_ptr = _malloc_internal(size);
+            if(!new_ptr) return NULL;
+            memcpy(new_ptr, owner->ptr, size);
+            _free_internal(ptr);
+            return new_ptr;
         }
     }
+}
+
+void *malloc(size_t size){   
+    enter_crit_section();
+    void *result = _malloc_internal(size);
+    exit_crit_section();
+    return result;
+}
+
+void free(void *ptr){
+    enter_crit_section();
+    _free_internal(ptr);
+    exit_crit_section();
+}
+
+
+void *realloc(void *ptr, size_t size){
+    enter_crit_section();
+    void *result = _realloc_internal(ptr,size);
+    exit_crit_section();
+    return result;
 }
 
 void *memcpy(void* dest, const void* src, size_t len){

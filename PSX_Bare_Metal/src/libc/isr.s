@@ -1,8 +1,10 @@
 .set noreorder
+.set noat
 .section .ktext, "ax", @progbits     
 .globl interrupt_vector  
 interrupt_vector:
-    j       interrupt_handler
+    la   $k0, interrupt_handler
+    jr   $k0
     nop
 
 .text

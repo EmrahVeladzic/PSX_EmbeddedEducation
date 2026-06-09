@@ -1,9 +1,11 @@
 #include <stdlib.h>
 #include <hardware.h>
 
+
+
+
 int main(void){
     
-   
 
     int8_t *array = malloc(48);
 
@@ -15,8 +17,10 @@ int main(void){
        array[i]=A[0];
     }  
 
+    
     array = realloc(array,24);
 
+    
     delay_microseconds(10000000);
 
     int8_t *crray = malloc(8);
@@ -34,10 +38,12 @@ int main(void){
     }
 
 
-   
+  
     cdrom_init();
 
-    int cmd = 0;
+    int cmd = 1;
+
+    
     
     while (1) {
        __asm__ volatile("");

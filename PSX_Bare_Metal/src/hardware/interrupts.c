@@ -32,7 +32,6 @@ static int index = 0;
 void generic_irq_test(void){
 
     
-
     const char msg[10] ="INTERRUPT\0";
 
     char *p = malloc(10);
