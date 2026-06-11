@@ -1,13 +1,15 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <hardware.h>
-
-
 
 
 int main(void){
     
 
     int8_t *array = malloc(48);
+
+    
+
 
     const char *A = "AAAAA";
     const char *B = "BBBBB";  
@@ -20,6 +22,7 @@ int main(void){
     
     array = realloc(array,24);
 
+    
     
     delay_microseconds(10000000);
 
@@ -37,27 +40,16 @@ int main(void){
         crray[i]=C[0];
     }
 
-
-  
-    cdrom_init();
-
-    int cmd = 1;
-
     
+
+    FILE *file = fopen("ASSETS/HELLO.TXT","rb");
+
+
     
     while (1) {
        __asm__ volatile("");
 
-     
-       while (cmd<10)
-       {
-        cdrom_issue_cmd(CD_CMD_PAUSE,0,NULL, CD_IRQ_S_CMD_FIN);
-        
-        cmd++;
-       }
-       
-
-       
+      
 
     }
 

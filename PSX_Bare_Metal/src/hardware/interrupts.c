@@ -3,6 +3,7 @@
 static INTERRUPT_MASK_CHANNEL FORMER_MASK = I_MASK_NONE;
 
 void enter_crit_section(void){
+    if(FORMER_MASK!=I_MASK_NONE){return;}
     FORMER_MASK = _MMIO32(I_MASK);
     MASK_TOGGLE32(I_MASK,I_MASK_ALL,0);
 }

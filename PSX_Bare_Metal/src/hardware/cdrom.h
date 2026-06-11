@@ -4,6 +4,7 @@
 #include <mmio.h>
 
 #define COM_DELAY 0x1F801020
+#define DATA_SECTOR_SIZE 2048
 
 typedef enum cd_reg : uintptr_t {
     CD_REG0 = 0x1F801800,
@@ -107,6 +108,25 @@ typedef enum cd_stat_mask : uint8_t {
     CD_STAT_SEEKING = 0x20
 } CD_STATUS_MASK;
 
+
+typedef enum cd_setmode : uint8_t {
+    CD_MODE_NORMAL_SPEED = 0x00,
+    CD_MODE_DOUBLE_SPEED = 0x80,
+    CD_MODE_ADPCM_OFF    = 0x00,
+    CD_MODE_ADPCM_ON     = 0x40,
+    CD_MODE_SIZE_2048    = 0x00,
+    CD_MODE_SIZE_2340    = 0x20,
+    CD_MODE_SIZE_2328    = 0x10,
+    CD_MODE_SF_OFF       = 0x00,
+    CD_MODE_SF_ON        = 0x08,
+    CD_MODE_REPORT_OFF   = 0x00,
+    CD_MODE_REPORT_ON    = 0x04,
+    CD_MODE_AUTOPAUSE_OFF = 0x00,
+    CD_MODE_AUTOPAUSE_ON  = 0x02,
+    CD_MODE_CDDA_OFF     = 0x00,
+    CD_MODE_CDDA_ON      = 0x01,
+} CD_MODE;
+
 #define CDROM_RDY !(_MMIO8(CD_REG0)&CD_BUSY)
 
 #define CDROM_RES_RDY (_MMIO8(CD_REG0) & !CD_RES_RRDY)
@@ -120,6 +140,8 @@ void cdrom_init(void);
 void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT *argv, CD_HINTSTS expected_response);
 
 extern uint8_t command_response[16];
+
+extern bool cdrom_up;
 
 
 #endif

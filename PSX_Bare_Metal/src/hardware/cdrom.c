@@ -1,9 +1,12 @@
 #include <cdrom.h>
 #include <interrupts.h>
+#include <dma.h>
 
 static volatile CD_HINTSTS current_status = CD_IRQ_S_NOIRQ;
 
 uint8_t command_response[16];
+
+bool cdrom_up = false;
 
 static void read_result(void){
     _MMIO8(CD_REG0) = CD_R0_BANK1;
@@ -24,8 +27,6 @@ static void read_result(void){
     _MMIO8(CD_REG0) = CD_R0_BANK0;
 
 
-
-   
 }
 
 static void cdrom_await_response(void){
@@ -35,6 +36,11 @@ static void cdrom_await_response(void){
 }
 
 void cdrom_init(void){   
+    if(cdrom_up){return;}
+
+    DMA_MASTER_ARM_ON;
+    enable_dma_channel(DMA_CH_CDROM);
+
 
     _MMIO8(CD_REG0) = CD_R0_BANK1;
     _MMIO8(CD_REG3) = CD_ACK_IRQ;
@@ -49,6 +55,8 @@ void cdrom_init(void){
     _MMIO8(CD_REG0)  = CD_R0_BANK0;
 
     set_interrupt_channel(I_MASK_CDROM, 1);
+    set_interrupt_channel(I_MASK_DMA, 1);
+
 
     for (size_t i = 0; i < 2; i++)
     {
@@ -60,6 +68,8 @@ void cdrom_init(void){
   
 
     cdrom_issue_cmd(CD_CMD_DEMUTE,0,NULL, CD_IRQ_S_ACK);
+
+    cdrom_up=true;
      
 }
 
@@ -102,7 +112,6 @@ void cdrom_irq(void){
     }
 
 
-   
 
     free(out);
    

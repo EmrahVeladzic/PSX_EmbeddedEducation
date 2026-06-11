@@ -1,5 +1,5 @@
 {
-    "cmake.cmakePath": "/snap/bin/cmake",
+    "cmake.cmakePath": "/usr/bin/cmake",
     "files.associations": {
         "registers.h": "c",
         "stdint.h": "c",

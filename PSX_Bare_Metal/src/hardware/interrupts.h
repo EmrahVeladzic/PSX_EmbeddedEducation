@@ -20,7 +20,7 @@ typedef enum i_msk{
     I_MASK_SIO = 0x100,
     I_MASK_SPU = 0x200,
     I_MASK_PERIPHERAL = 0x400,
-    I_MASK_ALL = 0x4FF
+    I_MASK_ALL = 0x7FF
 } INTERRUPT_MASK_CHANNEL;
 
 void enter_crit_section(void);

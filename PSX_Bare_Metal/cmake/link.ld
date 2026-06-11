@@ -10,7 +10,12 @@ MEMORY
 
 SECTIONS
 {
+    
+
+
     _ktextDest = 0x80000080;
+
+
 
     .text : ALIGN(4) {
         _textStart = .;
@@ -74,6 +79,7 @@ SECTIONS
         . = ALIGN(4);
         _bssLargeEnd = .;
         _bssEnd = .;
+
     } > MAIN_RAM
 
     .dummy (NOLOAD) : ALIGN(4) {
@@ -81,12 +87,15 @@ SECTIONS
         KEEP(*(.dummy))
         . = ALIGN(4);
         _dummyEnd = .;
+        . = ALIGN(8);
+        _heapStart = .;
     } > MAIN_RAM
 
     .stack (NOLOAD) : ALIGN(4) {
         _stackTop    = ORIGIN(MAIN_RAM) + LENGTH(MAIN_RAM) - STACK_PADDING;
         . = _stackTop - STACK_SIZE;
         _stackBottom = .;
+        _heapEnd = (_stackBottom - 8) & ~7;
         . = . + STACK_SIZE + STACK_PADDING;
     } > MAIN_RAM
 
