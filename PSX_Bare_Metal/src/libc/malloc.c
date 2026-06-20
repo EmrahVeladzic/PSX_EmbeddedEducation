@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <interrupts.h>
 #define ALIGN(addr,N) ((addr + (N-1))&(~(N-1)))
 

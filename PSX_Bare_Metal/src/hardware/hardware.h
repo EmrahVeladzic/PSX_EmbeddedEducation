@@ -9,4 +9,6 @@
 
 extern void delay_microseconds(size_t microseconds);
 
+char *ram_debug(const char *msg);
+
 #endif

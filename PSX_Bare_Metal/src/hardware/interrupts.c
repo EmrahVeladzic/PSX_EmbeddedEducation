@@ -1,4 +1,5 @@
 #include <interrupts.h>
+#include <string.h>
 
 static INTERRUPT_MASK_CHANNEL FORMER_MASK = I_MASK_NONE;
 
@@ -51,5 +52,16 @@ void generic_irq_test(void){
     free(p);
 
 
+    
+}
+
+
+char *ram_debug(const char *msg){
+   
+    char *p = malloc(strlen(msg));
+
+    memcpy(p,msg,strlen(msg));
+
+    return p;
     
 }
