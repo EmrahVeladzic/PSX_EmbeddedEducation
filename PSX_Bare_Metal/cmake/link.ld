@@ -87,11 +87,12 @@ SECTIONS
         KEEP(*(.dummy))
         . = ALIGN(4);
         _dummyEnd = .;
-        . = ALIGN(8);
-        _heapStart = .;
+
     } > MAIN_RAM
 
     .stack (NOLOAD) : ALIGN(4) {
+        . = ALIGN(8);
+        _heapStart = .;
         _stackTop    = ORIGIN(MAIN_RAM) + LENGTH(MAIN_RAM) - STACK_PADDING;
         . = _stackTop - STACK_SIZE;
         _stackBottom = .;

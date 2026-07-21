@@ -19,7 +19,7 @@ typedef struct sector_time
 typedef struct psx_file
 {
     size_t len_bytes;
-    size_t current_offset;
+    long current_offset;
     uint32_t lba;
 }FILE;
 
