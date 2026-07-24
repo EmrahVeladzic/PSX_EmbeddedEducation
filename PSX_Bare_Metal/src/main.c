@@ -43,7 +43,17 @@ int main(void){
     
 
     FILE *file = fopen("ASSETS/HELLO.TXT","rb");
+    fseek(file,0,SEEK_END);
 
+    size_t file_size = (size_t)ftell(file);
+
+    fseek(file,0,SEEK_SET);
+
+    char *data = malloc(file_size);
+
+    fread(data,file_size,1,file);
+   
+    fclose(file);
 
     
     while (1) {

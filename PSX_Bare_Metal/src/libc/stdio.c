@@ -11,10 +11,7 @@ bool system_ready = false;
 
 char *current_sector = NULL;
 
-uint8_t current_minute=0;
-uint8_t current_second=0;
-uint8_t current_frame=0;
-
+uint32_t current_lba = 0;
 
 typedef enum file_mode : uint8_t {
     FM_INVALID_MODE = 0x0,
@@ -31,36 +28,36 @@ typedef struct iso_p_entry{
 PathEntry *path_table = NULL;
 size_t path_count = 0;
 
-void read_lba(uint32_t lba){
+bool read_lba(uint32_t lba){
     SECTOR_TIME timestamp = from_lba(lba);
-    current_minute=timestamp.minute;
-    current_second=timestamp.second;
-    current_frame=timestamp.frame;
-
+    uint8_t target_minute=timestamp.minute;
+    uint8_t target_second=timestamp.second;
+    uint8_t target_frame=timestamp.frame;
     
-    cdrom_issue_cmd(CD_CMD_SETMODE,1,(CD_ARGUMENT[]){CD_MODE_DOUBLE_SPEED|CD_MODE_SIZE_2048},CD_IRQ_S_ACK);
-    cdrom_issue_cmd(CD_CMD_SETLOC,3,(uint8_t[]){current_minute,current_second,current_frame},CD_IRQ_S_ACK);
-    cdrom_issue_cmd(CD_CMD_READ_N,0,NULL,CD_IRQ_S_DATA_RDY);
+    if(!cdrom_issue_cmd(CD_CMD_SETMODE,1,(CD_ARGUMENT[]){CD_MODE_DOUBLE_SPEED|CD_MODE_SIZE_2048},CD_IRQ_S_ACK)){return false;}
+    if(!cdrom_issue_cmd(CD_CMD_SETLOC,3,(uint8_t[]){target_minute,target_second,target_frame},CD_IRQ_S_ACK)){return false;}
+    if(!cdrom_issue_cmd(CD_CMD_READ_N,0,NULL,CD_IRQ_S_DATA_RDY)){return false;}
 
     _MMIO8(CD_REG0) = CD_R0_BANK0;
     _MMIO8(CD_REG3) = CD_BFRD;
 
     while(!(_MMIO8(CD_REG0) & CD_DATA_REQ)){__asm__ volatile("");} 
     start_dma_transfer(DMA_CH_CDROM,current_sector,DATA_SECTOR_SIZE>>2,DMA_START|DMA_FORCE);   
-    cdrom_issue_cmd(CD_CMD_PAUSE,0,NULL,CD_IRQ_S_ACK);
-
-
+    if(!cdrom_issue_cmd(CD_CMD_PAUSE,0,NULL,CD_IRQ_S_ACK)){return false;}
+    current_lba=lba;
+    return true;
 }
 
 void init_system(){
     if(!cdrom_up){
         cdrom_init();
+        if(!cdrom_up){return;}
     }
 
     current_sector=malloc(DATA_SECTOR_SIZE);
     if(!current_sector){return;}
 
-    read_lba(16);
+    if(!read_lba(16)){return;}
 
 
     int32_t p_table_size;
@@ -76,7 +73,7 @@ void init_system(){
 
     for (uint32_t i = 0; i < p_table_sector_end; i++)
     {
-        read_lba(i+18);
+        if(!read_lba(i+18)){return;}
         memcpy(p_buffer+(i*DATA_SECTOR_SIZE),current_sector,DATA_SECTOR_SIZE);
        
     }
@@ -105,8 +102,6 @@ void init_system(){
 
     }
 
-  
-    
     free(p_buffer);
 
     system_ready = true;
@@ -239,10 +234,77 @@ FILE *fopen(const char *path, const char *mode){
     return fopen_internal(path,md);
 }
 
+int fseek(FILE *fptr, long offset, int origin) {
+    long off = fptr->current_offset;
 
-size_t fread(void *dest, size_t size, size_t amount, FILE *fptr);
+    switch (origin) {
+    case SEEK_CUR:
+        off += offset;
+        break;
+    case SEEK_SET:
+        off = offset;
+        break;
+    case SEEK_END:
+        off = (long)fptr->len_bytes + offset;
+        break;
+    default:
+        return 1;
+    }
+
+    if (off < 0 || off > (long)fptr->len_bytes) { return 1; }
+
+    uint32_t lba = fptr->lba +  (off / DATA_SECTOR_SIZE);
+    if (current_lba != lba) {
+        if (!read_lba(lba)) { return 2; }
+    }
+
+    fptr->current_offset = off;
+    return 0;
+}
+
+size_t fread(void *dest, size_t size, size_t amount, FILE *fptr){
+
+    uint32_t lba = fptr->lba + (fptr->current_offset / DATA_SECTOR_SIZE);
+
+    if(current_lba!=lba){
+        if(!read_lba(lba)){return 0;}
+    }
+
+    size_t bytes_request = size*amount;
+
+    if(bytes_request>fptr->len_bytes-(size_t)fptr->current_offset){bytes_request=fptr->len_bytes-(size_t)fptr->current_offset;}
+    size_t request_copy = bytes_request;
+
+    size_t partial_sector = (DATA_SECTOR_SIZE - (fptr->current_offset % DATA_SECTOR_SIZE));
+
+    void *final_dest = dest;
+
+    while (bytes_request>0)
+    {
+        size_t current_request = (bytes_request < partial_sector) ? bytes_request : partial_sector;
+
+        memcpy(final_dest,current_sector+(DATA_SECTOR_SIZE-partial_sector),current_request);
+
+        bytes_request-=current_request;
+        final_dest+=current_request;
+        partial_sector=DATA_SECTOR_SIZE;
+        fptr->current_offset+=(long)current_request;
+
+        if(bytes_request>0){
+           if(!read_lba(++current_lba)){break;}
+        }
+
+    }
+
+    return (request_copy-bytes_request)/size;
+}
+
+long ftell(FILE *fptr){
+    if(!fptr){return -1L;}
+    return fptr->current_offset;
+}
 
 int fclose(FILE *fptr){
-    fptr->current_offset=0;
+    free(fptr);
     return 0;
 }

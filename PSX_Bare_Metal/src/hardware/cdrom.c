@@ -2,23 +2,23 @@
 #include <interrupts.h>
 #include <dma.h>
 
-static volatile CD_HINTSTS current_status = CD_IRQ_S_NOIRQ;
+volatile CD_HINTSTS cdrom_current_status = CD_IRQ_S_NOIRQ;
 
-uint8_t command_response[16];
+uint8_t cdrom_command_response[16];
 
 bool cdrom_up = false;
 
 static void read_result(void){
     _MMIO8(CD_REG0) = CD_R0_BANK1;
-    current_status = (_MMIO8(CD_REG3) & CD_INTERRUPT_RMASK);
+    cdrom_current_status = (_MMIO8(CD_REG3) & CD_INTERRUPT_RMASK);
   
     for(size_t i = 0; i < 16; i++){
-        command_response[i] = 0;
+        cdrom_command_response[i] = 0;
     }
 
     size_t index = 0;
     while(_MMIO8(CD_REG0) & CD_RES_RRDY){
-        command_response[index] = _MMIO8(CD_REG1);
+        cdrom_command_response[index] = _MMIO8(CD_REG1);
         index++;
     }
     _MMIO8(CD_REG0) = CD_R0_BANK1;
@@ -30,7 +30,7 @@ static void read_result(void){
 }
 
 static void cdrom_await_response(void){
-    while(current_status == CD_IRQ_S_NOIRQ){
+    while(cdrom_current_status == CD_IRQ_S_NOIRQ){
         __asm__ volatile("");
     }
 }
@@ -41,10 +41,8 @@ void cdrom_init(void){
     DMA_MASTER_ARM_ON;
     enable_dma_channel(DMA_CH_CDROM);
 
-
     _MMIO8(CD_REG0) = CD_R0_BANK1;
     _MMIO8(CD_REG3) = CD_ACK_IRQ;
-
 
     _MMIO8(CD_REG0)  = CD_R0_BANK0;
     _MMIO8(CD_REG3)  = CD_HCHPCTL_INIT;
@@ -59,24 +57,20 @@ void cdrom_init(void){
 
 
     for (size_t i = 0; i < 2; i++)
-    {
-        cdrom_issue_cmd(CD_CMD_NOP,0,NULL, CD_IRQ_S_ACK);
-       
-    }
+    {       
+       if(!cdrom_issue_cmd(CD_CMD_NOP,0,NULL, CD_IRQ_S_ACK)){return;}
+    }    
     
-    cdrom_issue_cmd(CD_CMD_INIT,0,NULL, CD_IRQ_S_CMD_FIN);
-  
-
-    cdrom_issue_cmd(CD_CMD_DEMUTE,0,NULL, CD_IRQ_S_ACK);
-
-    cdrom_up=true;
+    if(!cdrom_issue_cmd(CD_CMD_INIT,0,NULL, CD_IRQ_S_CMD_FIN)){return;}
+    
+    if(cdrom_issue_cmd(CD_CMD_DEMUTE,0,NULL, CD_IRQ_S_ACK)){cdrom_up=true;}
      
 }
 
-void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT* argv, CD_HINTSTS expected_response){
+bool cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT* argv, CD_HINTSTS expected_response){
     
 
-    current_status = CD_IRQ_S_NOIRQ;
+    cdrom_current_status = CD_IRQ_S_NOIRQ;
     _MMIO8(CD_REG0) = CD_R0_BANK0;
     if(argv){
         for(uint8_t i = 0; i < argc; i++){
@@ -86,11 +80,12 @@ void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT* argv, CD_HINTSTS
     _MMIO8(CD_REG0) = CD_R0_BANK0;
     _MMIO8(CD_REG1) = cmd;
 
-    while (current_status!=expected_response && current_status!=CD_IRQ_S_ERR)
+    while (cdrom_current_status!=expected_response && cdrom_current_status!=CD_IRQ_S_ERR)
     {      
         cdrom_await_response();
     }  
 
+    return !(CDROM_ERR);
 }
 
 void cdrom_irq(void){

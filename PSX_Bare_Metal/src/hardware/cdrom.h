@@ -137,11 +137,16 @@ void cdrom_irq(void);
 
 void cdrom_init(void);
 
-void cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT *argv, CD_HINTSTS expected_response);
+bool cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT *argv, CD_HINTSTS expected_response);
 
-extern uint8_t command_response[16];
+extern uint8_t cdrom_command_response[16];
 
 extern bool cdrom_up;
+
+extern volatile CD_HINTSTS cdrom_current_status;
+
+#define CDROM_ERR (cdrom_current_status == CD_IRQ_S_ERR)
+
 
 
 #endif
