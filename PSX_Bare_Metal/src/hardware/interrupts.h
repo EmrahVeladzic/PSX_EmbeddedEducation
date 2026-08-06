@@ -26,7 +26,7 @@ typedef enum i_msk{
 void enter_crit_section(void);
 void exit_crit_section(void);
 
-void set_interrupt_channel(INTERRUPT_MASK_CHANNEL channel, int state);
+void set_interrupt_channel(INTERRUPT_MASK_CHANNEL channel, bool state);
 
 void generic_irq_test(void);
 

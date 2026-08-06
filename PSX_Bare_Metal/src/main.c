@@ -40,22 +40,35 @@ int main(void){
         crray[i]=C[0];
     }
 
-    
 
-    FILE *file = fopen("ASSETS/HELLO.TXT","rb");
-    fseek(file,0,SEEK_END);
+    FILE *file = fopen("ASSETS/LEAVES.WL","rb");
 
-    size_t file_size = (size_t)ftell(file);
+    fseek(file,2,SEEK_SET);
 
-    fseek(file,0,SEEK_SET);
+    uint16_t sample_rate;
 
-    char *data = malloc(file_size);
+    fread(&sample_rate,sizeof(uint16_t),1,file);
 
-    fread(data,file_size,1,file);
-   
+    uint32_t block_count;
+
+    fread(&block_count,sizeof(uint32_t),1,file);
+
+    void *data = malloc((size_t)(block_count*16));
+
+    fread(data,16,block_count,file);
+
     fclose(file);
 
-    
+    load_audio(data,block_count,sample_rate,0);
+
+    free(data);
+
+
+    SPU_KEY_ON(0);
+
+
+
+
     while (1) {
        __asm__ volatile("");
 

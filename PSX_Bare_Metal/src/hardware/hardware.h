@@ -3,6 +3,7 @@
 
 #include <dma.h>
 #include <cdrom.h>
+#include <spu.h>
 #include <interrupts.h>
 
 #define CPU_FREQ 0x204CC00

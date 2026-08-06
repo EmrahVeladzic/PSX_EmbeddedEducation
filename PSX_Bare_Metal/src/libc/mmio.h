@@ -14,9 +14,9 @@
     #define _MMIO16(input)(*_ADDR16(input))
     #define _MMIO32(input)(*_ADDR32(input))
 
-    #define MASK_TOGGLE8(addr,mask,state)do{if(state){_MMIO8(addr)|=mask;}else{_MMIO8(addr)&=~mask;}}while(0)
-    #define MASK_TOGGLE16(addr,mask,state)do{if(state){_MMIO16(addr)|=mask;}else{_MMIO16(addr)&=~mask;}}while(0)
-    #define MASK_TOGGLE32(addr,mask,state)do{if(state){_MMIO32(addr)|=mask;}else{_MMIO32(addr)&=~mask;}}while(0)
+    #define MASK_TOGGLE8(addr,mask,state)do{if(state){_MMIO8(addr)|=mask;}else{_MMIO8(addr)&=~mask;}}while(false)
+    #define MASK_TOGGLE16(addr,mask,state)do{if(state){_MMIO16(addr)|=mask;}else{_MMIO16(addr)&=~mask;}}while(false)
+    #define MASK_TOGGLE32(addr,mask,state)do{if(state){_MMIO32(addr)|=mask;}else{_MMIO32(addr)&=~mask;}}while(false)
     
     
 

@@ -137,7 +137,7 @@ void cdrom_irq(void);
 
 void cdrom_init(void);
 
-bool cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT *argv, CD_HINTSTS expected_response);
+bool cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT *argv, CD_HINTSTS expected_response, bool sync);
 
 extern uint8_t cdrom_command_response[16];
 

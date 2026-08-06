@@ -15,6 +15,8 @@ file(GLOB commonSrc
     src/libc/*.s
     src/hardware/*.c
     src/hardware/*.s
+    src/game/*.s
+    src/game/*.c
 )
 
 add_library(common OBJECT ${commonSrc})
@@ -24,6 +26,7 @@ target_include_directories(
     src
     src/libc
     src/hardware
+    src/game
 )
 
 

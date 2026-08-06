@@ -5,7 +5,7 @@
 
 #define SECTOR_COUNT(x) (((x) + DATA_SECTOR_SIZE - 1) / DATA_SECTOR_SIZE)
 #define PATH_ENTRY_SIZE(x) (8 + ((x) + ((x) & 0x1)))
-#define DIRECTORY_ENTRY_SIZE(x) (33 + ((x) + !((x) & 0x1)))
+
 
 bool system_ready = false;
 
@@ -34,16 +34,16 @@ bool read_lba(uint32_t lba){
     uint8_t target_second=timestamp.second;
     uint8_t target_frame=timestamp.frame;
     
-    if(!cdrom_issue_cmd(CD_CMD_SETMODE,1,(CD_ARGUMENT[]){CD_MODE_DOUBLE_SPEED|CD_MODE_SIZE_2048},CD_IRQ_S_ACK)){return false;}
-    if(!cdrom_issue_cmd(CD_CMD_SETLOC,3,(uint8_t[]){target_minute,target_second,target_frame},CD_IRQ_S_ACK)){return false;}
-    if(!cdrom_issue_cmd(CD_CMD_READ_N,0,NULL,CD_IRQ_S_DATA_RDY)){return false;}
+    if(!cdrom_issue_cmd(CD_CMD_SETMODE,1,(CD_ARGUMENT[]){CD_MODE_DOUBLE_SPEED|CD_MODE_SIZE_2048},CD_IRQ_S_ACK,true)){return false;}
+    if(!cdrom_issue_cmd(CD_CMD_SETLOC,3,(uint8_t[]){target_minute,target_second,target_frame},CD_IRQ_S_ACK,true)){return false;}
+    if(!cdrom_issue_cmd(CD_CMD_READ_N,0,NULL,CD_IRQ_S_DATA_RDY,true)){return false;}
 
     _MMIO8(CD_REG0) = CD_R0_BANK0;
     _MMIO8(CD_REG3) = CD_BFRD;
 
     while(!(_MMIO8(CD_REG0) & CD_DATA_REQ)){__asm__ volatile("");} 
-    start_dma_transfer(DMA_CH_CDROM,current_sector,DATA_SECTOR_SIZE>>2,DMA_START|DMA_FORCE);   
-    if(!cdrom_issue_cmd(CD_CMD_PAUSE,0,NULL,CD_IRQ_S_ACK)){return false;}
+    start_dma_transfer(DMA_CH_CDROM,current_sector,DATA_SECTOR_SIZE>>2,DMA_START|DMA_FORCE,true);   
+    if(!cdrom_issue_cmd(CD_CMD_PAUSE,0,NULL,CD_IRQ_S_ACK,true)){return false;}
     current_lba=lba;
     return true;
 }
@@ -156,6 +156,7 @@ FILE *fopen_internal(const char *path, F_MODE mode){
         {
             if(path_table[i].parent==dir && streq(path_table[i].name,prefix)){
                 dir = i;
+                break;
             }
         }
         
@@ -181,7 +182,8 @@ FILE *fopen_internal(const char *path, F_MODE mode){
     dir_entry[12]='\0';
     for (uint32_t i = 0; i < DATA_SECTOR_SIZE && current_sector[i]; i+=inc)
     {
-        inc = DIRECTORY_ENTRY_SIZE(current_sector[i]);
+        inc = (uint8_t)current_sector[i];
+        if (inc == 0) { break; } 
 
         uint8_t nl = current_sector[i+32]-1;
 
