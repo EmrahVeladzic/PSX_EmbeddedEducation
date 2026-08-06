@@ -1,4 +1,0 @@
-/home/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/CMakeFiles/common.dir
-/home/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/CMakeFiles/main.dir
-/home/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/CMakeFiles/edit_cache.dir
-/home/emrah/Documents/GitHub/PSX_EmbeddedEducation/PSX_Bare_Metal/CMakeFiles/rebuild_cache.dir
