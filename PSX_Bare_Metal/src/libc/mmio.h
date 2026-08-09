@@ -6,9 +6,9 @@
 
     #define MMIO_BASE 0xBF801000
 
-    #define _ADDR8(input)((volatile uint8_t *)input)
-    #define _ADDR16(input)((volatile uint16_t *)input)
-    #define _ADDR32(input)((volatile uint32_t *)input)
+    #define _ADDR8(input)  ((volatile uint8_t  *)(input))
+    #define _ADDR16(input) ((volatile uint16_t *)(input))
+    #define _ADDR32(input) ((volatile uint32_t *)(input))
 
     #define _MMIO8(input)(*_ADDR8(input))
     #define _MMIO16(input)(*_ADDR16(input))

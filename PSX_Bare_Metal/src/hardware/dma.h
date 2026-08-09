@@ -36,7 +36,7 @@ typedef enum dma_p : uint32_t{
 
 #define DMA_CHCR_BUSY(ch) ((_MMIO32(DMA_CHCR(ch))>>24)&0x1)
 
-#define DMA_SYNC(ch) while (DMA_CHCR_BUSY(ch)){ __asm__ volatile("");}
+#define DMA_SYNC(ch) do{ while(DMA_CHCR_BUSY(ch)){ __asm__ volatile(""); } }while(false)
 
 #define DMA_DICR_RMW_MASK 0x00FF7FFF
 
@@ -44,7 +44,7 @@ typedef enum dma_p : uint32_t{
 #define DMA_IRQ_CH_OFF(ch) (_MMIO32(DMA_DICR)=((_MMIO32(DMA_DICR)&DMA_DICR_RMW_MASK)&~(0x1u<<((ch)+16))))
 
 #define DMA_ACK(ch) (_MMIO32(DMA_DICR)=((_MMIO32(DMA_DICR)&DMA_DICR_RMW_MASK)|(0x1u<<((ch)+24))))
-#define DMA_PENDING() ((_MMIO32(DMA_DICR)>>24)&0x7F)
+#define DMA_PENDING ((_MMIO32(DMA_DICR)>>24)&0x7F)
 
 #define DMA_MASTER_ARM_ON (_MMIO32(DMA_DICR)=((_MMIO32(DMA_DICR)&DMA_DICR_RMW_MASK)|0x00800000))
 #define DMA_MASTER_ARM_OFF (_MMIO32(DMA_DICR)=((_MMIO32(DMA_DICR)&DMA_DICR_RMW_MASK)&~0x00800000))

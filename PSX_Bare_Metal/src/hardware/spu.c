@@ -28,11 +28,15 @@ void spu_init(void){
         SPU_VOICE_ADSR(v, 0, 0);
     }
 
-    _MMIO16(0x1F801D8C) = 0xFFFF;   /* KOFF voices 0-15  */
-    _MMIO16(0x1F801D8E) = 0x00FF;   /* KOFF voices 16-23 */
+   
+    for (int v = 0; v < 24; v++) {
+        SPU_KEY_OFF(v);
+    }
 
     SPU_CNT_WRITE(SPU_ENABLE | SPU_DEMUTE);
     while ((SPU_STAT_READ() & SPUSTAT_MODE_MASK)) {__asm__ volatile("");}
+
+    SPU_REVERB_VOLUME_BOTH(0);
 
     spu_up = true;
 
@@ -59,12 +63,14 @@ bool load_audio(void *buffer, uint32_t blocks, uint16_t sample_rate, uint8_t voi
     SPU_VOICE_ADSR(voice, 0x00FF, 0x0000);
     SPU_VOICE_VOLUME_BOTH(voice, 0x3FFF);
 
+    SPU_MASTER_VOLUME_BOTH(0x3FFF);
+
     return true;
 
 }
 
 void spu_irq(void){
-     uint16_t cnt = SPU_CNT_READ();
+    uint16_t cnt = SPU_CNT_READ();
     SPU_CNT_WRITE(cnt & ~SPU_IRQ);   
     SPU_CNT_WRITE(cnt |  SPU_IRQ);  
 }

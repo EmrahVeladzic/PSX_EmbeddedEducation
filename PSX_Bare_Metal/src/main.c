@@ -59,6 +59,8 @@ int main(void){
 
     fclose(file);
 
+    
+
     load_audio(data,block_count,sample_rate,0);
 
     free(data);

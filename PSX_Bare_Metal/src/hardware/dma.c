@@ -25,11 +25,10 @@ void start_dma_transfer(DMA_CHANNEL ch, void* address, uint32_t bcr, DMA_CHCR_FL
 }
 
 void dma_irq(void){
-    uint32_t pending = DMA_PENDING();
+    uint32_t pending = DMA_PENDING;
     for (int ch = 0; ch < 7; ch++){
         if (pending & (1u << ch)){
             DMA_ACK(ch);  
         }
     }
-    ram_debug("DMA_IRQ");
 }
