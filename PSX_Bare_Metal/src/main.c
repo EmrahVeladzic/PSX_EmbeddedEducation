@@ -4,11 +4,9 @@
 
 
 int main(void){
-    
 
     int8_t *array = malloc(48);
 
-    
 
 
     const char *A = "AAAAA";
@@ -16,15 +14,12 @@ int main(void){
     const char *C = "CCCCC";
 
     for (size_t i = 0; i < 48; i++){
-       array[i]=A[0];
+        array[i]=A[0];
     }  
 
-    
     array = realloc(array,24);
 
-    
-    
-    delay_microseconds(10000000);
+    delay_microseconds(5000000);
 
     int8_t *crray = malloc(8);
 
@@ -59,7 +54,6 @@ int main(void){
 
     fclose(file);
 
-    
 
     load_audio(data,block_count,sample_rate,0);
 
@@ -69,12 +63,9 @@ int main(void){
     SPU_KEY_ON(0);
 
 
-
-
     while (1) {
-       __asm__ volatile("");
+        __asm__ volatile("");
 
-      
 
     }
 

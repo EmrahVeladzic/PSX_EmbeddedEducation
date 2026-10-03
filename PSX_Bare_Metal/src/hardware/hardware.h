@@ -6,6 +6,7 @@
 #include <spu.h>
 #include <interrupts.h>
 
+
 #define CPU_FREQ 0x204CC00
 
 extern void delay_microseconds(size_t microseconds);

@@ -11,11 +11,7 @@ MEMORY
 SECTIONS
 {
     
-
-
     _ktextDest = 0x80000080;
-
-
 
     .text : ALIGN(4) {
         _textStart = .;

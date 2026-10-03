@@ -128,6 +128,9 @@ FILE *fopen_internal(const char *path, F_MODE mode){
     char prefix[9];
     prefix[8]='\0';
     size_t len = strlen(path);
+
+    if(!len || path[len-1]=='/'){return NULL;}
+
     char *suffix = malloc(len+1);
     char *init_suffix = suffix;
     char file_name [13];
@@ -183,17 +186,20 @@ FILE *fopen_internal(const char *path, F_MODE mode){
     for (uint32_t i = 0; i < DATA_SECTOR_SIZE && current_sector[i]; i+=inc)
     {
         inc = (uint8_t)current_sector[i];
-        if (inc == 0) { break; } 
+        if (inc == 0) { break; }         
 
         uint8_t nl = current_sector[i+32]-1;
 
+        if(nl>1){nl--;}
+
         if (nl > 12) {nl = 12;}
 
+        if(nl<1) {nl = 1;}
+
         memcpy(dir_entry,(current_sector+i+33),nl);
-
-        dir_entry[nl-1]='\0';
-       
-
+        
+        dir_entry[nl]='\0'; 
+              
 
         if(streq(file_name,dir_entry)){
 
@@ -225,6 +231,7 @@ FILE *fopen_internal(const char *path, F_MODE mode){
 FILE *fopen(const char *path, const char *mode){
     if(!system_ready){
         init_system();
+        if(!system_ready){return NULL;}
     }
     if(!(path&&mode)){return NULL;}
 

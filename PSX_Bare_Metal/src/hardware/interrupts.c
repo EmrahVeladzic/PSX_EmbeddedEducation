@@ -36,7 +36,11 @@ char *ram_debug(const char *msg){
    
     char *p = malloc(strlen(msg));
 
-    memcpy(p,msg,strlen(msg));
+    if(p){
+
+        memcpy(p,msg,strlen(msg));
+
+    }
 
     return p;
     
