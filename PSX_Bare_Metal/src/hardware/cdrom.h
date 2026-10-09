@@ -129,8 +129,6 @@ typedef enum cd_setmode : uint8_t {
 
 #define CDROM_RDY !(_MMIO8(CD_REG0)&CD_BUSY)
 
-#define CDROM_RES_RDY (_MMIO8(CD_REG0) & !CD_RES_RRDY)
-
 #define CDROM_SYNC while (!CDROM_RDY){ __asm__ volatile("");}
 
 void cdrom_irq(void);

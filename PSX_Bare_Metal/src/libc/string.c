@@ -39,3 +39,32 @@ size_t split_next (char *str, char separator,char **output){
     return len;
 
 }
+
+void *memcpy(void* dest, const void* src, size_t len){
+    if(len!=0&&dest!=src){
+        uint8_t *destination = (uint8_t*)dest;
+        const uint8_t *source = (uint8_t*)src;
+        for (size_t i = 0; i < len; i++){
+            destination[i]=source[i];
+        }
+    }   
+    return dest;
+}
+
+void *memmove(void* dest, const void* src, size_t len){
+    if(len!=0&&dest!=src){
+        uint8_t *destination = (uint8_t*)dest;
+        const uint8_t *source = (uint8_t*)src;
+        if(dest<src){
+            for (size_t i = 0; i < len; i++){
+                destination[i]=source[i];
+            }            
+        }
+        else{
+             for (size_t i = len; i > 0; i--){
+                destination[i-1]=source[i-1];
+            }  
+        }       
+    }   
+    return dest;
+}

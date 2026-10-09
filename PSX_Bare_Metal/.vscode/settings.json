@@ -1,13 +1,7 @@
 {
-    "cmake.cmakePath": "/usr/bin/cmake",
     "files.associations": {
-        "registers.h": "c",
-        "stdint.h": "c",
-        "stdint-gcc.h": "c",
-        "stddef.h": "c",
-        "stdlib.h": "c",
-        "dma.h": "c",
-        "mmio.h": "c"
+        "*.h": "c"
     },
-    "C_Cpp.default.compilerPath": "/home/emrah/mips-toolchain/bin/mipsel-none-elf-gcc"
+    "cmake.generator": "Ninja",
+    "cmake.buildDirectory": "${workspaceFolder}/build"
 }

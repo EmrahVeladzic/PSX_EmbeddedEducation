@@ -69,7 +69,7 @@ void cdrom_init(void){
 
 bool cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT* argv, CD_HINTSTS expected_response, bool sync){
     
-
+    CDROM_SYNC;
     cdrom_current_status = CD_IRQ_S_NOIRQ;
     _MMIO8(CD_REG0) = CD_R0_BANK0;
     if(argv){
@@ -87,7 +87,9 @@ bool cdrom_issue_cmd(CD_COMMAND cmd, uint8_t argc, CD_ARGUMENT* argv, CD_HINTSTS
         }  
     }
 
-    return !(CDROM_ERR);
+    bool ok = !(CDROM_ERR);
+    cdrom_current_status = CD_IRQ_S_NOIRQ;
+    return ok;
 }
 
 void cdrom_irq(void){

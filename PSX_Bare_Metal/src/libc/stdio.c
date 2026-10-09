@@ -43,7 +43,7 @@ bool read_lba(uint32_t lba){
 
     while(!(_MMIO8(CD_REG0) & CD_DATA_REQ)){__asm__ volatile("");} 
     start_dma_transfer(DMA_CH_CDROM,current_sector,DATA_SECTOR_SIZE>>2,DMA_START|DMA_FORCE,true);   
-    if(!cdrom_issue_cmd(CD_CMD_PAUSE,0,NULL,CD_IRQ_S_ACK,true)){return false;}
+    if(!cdrom_issue_cmd(CD_CMD_PAUSE,0,NULL,CD_IRQ_S_CMD_FIN,true)){return false;}
     current_lba=lba;
     return true;
 }
@@ -80,12 +80,20 @@ void init_system(){
 
     uint32_t inc = 0;
 
-    for (uint32_t i = 0; i < p_table_size; i+=inc)
+    for (int32_t i = 0; i < p_table_size; i+=inc)
     {
         inc = PATH_ENTRY_SIZE(p_buffer[i]);
 
+        PathEntry *pt = realloc(path_table,(path_count+1)*sizeof(PathEntry));
+
+        if(!pt){ 
+            free(p_buffer);
+            return; 
+        }
+        
+        path_table=pt;
         path_count ++;
-        path_table = realloc(path_table,path_count*sizeof(PathEntry));
+        
 
         if(!path_table){return;}
 
@@ -123,7 +131,7 @@ SECTOR_TIME from_lba(size_t lba){
 }
 
 
-FILE *fopen_internal(const char *path, F_MODE mode){
+FILE *fopen_internal(const char *path, [[maybe_unused]] F_MODE mode){
   
     char prefix[9];
     prefix[8]='\0';
@@ -141,13 +149,18 @@ FILE *fopen_internal(const char *path, F_MODE mode){
 
     uint16_t dir = 0;
 
-    do
-    {
+    bool no_match = false;
+
+    while (true){
+
+        no_match = true;
+
         len = strlen(suffix);
        
         char *temp;
 
         sub_len = split_next(suffix,'/',&temp);
+        if (len == sub_len) { break; }
 
         size_t copy_len = (len > sub_len) ? (len - sub_len - 1) : 0;
         if (copy_len > 8) { copy_len = 8; }
@@ -157,16 +170,22 @@ FILE *fopen_internal(const char *path, F_MODE mode){
 
         for (size_t i = 0; i < path_count; i++)
         {
-            if(path_table[i].parent==dir && streq(path_table[i].name,prefix)){
+            if(path_table[i].parent==(dir) && streq(path_table[i].name,prefix)){
                 dir = i;
+                no_match=false;
                 break;
             }
         }
         
+        if(no_match){
+            free(init_suffix);
+            return NULL;
+        }
 
         suffix = temp;
 
-    } while (len!=sub_len);  
+    }
+   
 
     memcpy(file_name,suffix,strlen(suffix));
     file_name[strlen(suffix)]='\0';
@@ -273,6 +292,8 @@ int fseek(FILE *fptr, long offset, int origin) {
 
 size_t fread(void *dest, size_t size, size_t amount, FILE *fptr){
 
+    if(!size || !amount || !dest || !fptr){return 0;}
+
     uint32_t lba = fptr->lba + (fptr->current_offset / DATA_SECTOR_SIZE);
 
     if(current_lba!=lba){
@@ -300,7 +321,7 @@ size_t fread(void *dest, size_t size, size_t amount, FILE *fptr){
         fptr->current_offset+=(long)current_request;
 
         if(bytes_request>0){
-           if(!read_lba(++current_lba)){break;}
+           if(!read_lba(current_lba+1)){break;}
         }
 
     }

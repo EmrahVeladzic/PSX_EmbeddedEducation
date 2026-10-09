@@ -1,23 +1,16 @@
 {
-    "configurations": [        
+    "configurations": [
         {
             "name": "Mipsel GCC",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json",
             "includePath": [
-                "${workspaceFolder}/**",
-                "/home/emrah/mips-toolchain/mipsel-none-elf/include"
-               
+                "${workspaceFolder}/src/**"
             ],
             "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE",
-                "__STDC_HOSTED__=0"               
+                "__STDC_HOSTED__=0"
             ],
-            "compilerPath": "/home/emrah/mips-toolchain/bin/mipsel-none-elf-gcc",
             "cStandard": "c23",
-            
             "intelliSenseMode": "gcc-arm"
-            
         }
     ],
     "version": 4

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <interrupts.h>
+#include <unlocked.h>
 #define ALIGN(addr,N) (((addr) + ((N)-1)) & (~((N)-1)))
 
 extern uint8_t _heapStart[];
@@ -27,7 +28,7 @@ static inline void init_heap(){
     malloc_head->size=(HEAP_LIMIT-((uintptr_t)malloc_head+sizeof(Block)));
 }
 
-static void *_malloc_internal(size_t size){
+void *_malloc_internal(size_t size){
     if(!malloc_head){
         init_heap();
     }    
@@ -62,7 +63,7 @@ static void *_malloc_internal(size_t size){
     return NULL;
 }
 
-static void _free_internal(void *ptr){
+void _free_internal(void *ptr){
     if(!malloc_head){
         init_heap();
     } 
@@ -71,6 +72,7 @@ static void _free_internal(void *ptr){
         return;   
     }
     Block *owner = ((Block*)ptr) - 1;
+    if (owner->ptr != ptr) { return; }
     owner->ptr=NULL;
     Block *eval = owner->next;
     while (eval && !eval->ptr)
@@ -95,7 +97,7 @@ static void _free_internal(void *ptr){
     } 
 }
 
-static void *_realloc_internal(void *ptr, size_t size){
+void *_realloc_internal(void *ptr, size_t size){
 if(!malloc_head){
         init_heap();
     } 
@@ -130,7 +132,10 @@ if(!malloc_head){
             void *new_ptr = _malloc_internal(size);
             if(new_ptr){
                 memcpy(new_ptr, owner->ptr, owner->size);
-            }
+            }        
+            else{
+                return NULL;
+            }   
             _free_internal(ptr);
             return new_ptr;
         }
@@ -147,15 +152,18 @@ if(!malloc_head){
             new_block->prev=owner;
             owner->next=new_block;
             owner->size=adjusted_size-sizeof(Block);
+            Block *after = new_block->next;
+            if(after && !after->ptr){
+                new_block->size += sizeof(Block) + after->size;
+                new_block->next = after->next;
+                if(new_block->next){
+                    new_block->next->prev = new_block;
+                }
+            }
             return owner->ptr;
         }
         else{
-            void *new_ptr = _malloc_internal(size);
-            if(new_ptr){
-                memcpy(new_ptr, owner->ptr, size);
-            }
-            _free_internal(ptr);
-            return new_ptr;
+            return ptr;
         }
     }
 }
@@ -181,31 +189,3 @@ void *realloc(void *ptr, size_t size){
     return result;
 }
 
-void *memcpy(void* dest, const void* src, size_t len){
-    if(len!=0&&dest!=src){
-        uint8_t *destination = (uint8_t*)dest;
-        const uint8_t *source = (uint8_t*)src;
-        for (size_t i = 0; i < len; i++){
-            destination[i]=source[i];
-        }
-    }   
-    return dest;
-}
-
-void *memmove(void* dest, const void* src, size_t len){
-    if(len!=0&&dest!=src){
-        uint8_t *destination = (uint8_t*)dest;
-        const uint8_t *source = (uint8_t*)src;
-        if(dest<src){
-            for (size_t i = 0; i < len; i++){
-                destination[i]=source[i];
-            }            
-        }
-        else{
-             for (size_t i = len; i > 0; i--){
-                destination[i-1]=source[i-1];
-            }  
-        }       
-    }   
-    return dest;
-}

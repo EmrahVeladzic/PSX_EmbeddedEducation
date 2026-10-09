@@ -1,6 +1,7 @@
 #include <interrupts.h>
 #include <hardware.h>
 #include <string.h>
+#include <unlocked.h>
 
 static INTERRUPT_MASK_CHANNEL FORMER_MASK = I_MASK_NONE;
 
@@ -32,9 +33,17 @@ void set_interrupt_channel(INTERRUPT_MASK_CHANNEL channel, bool state){
 
 
 
-char *ram_debug(const char *msg){
+char *ram_debug(const char *msg, bool isr){
    
-    char *p = malloc(strlen(msg));
+    char *p = NULL;
+
+    if(isr){
+        p = _malloc_internal(strlen(msg));
+    }
+    else{
+        p = malloc(strlen(msg));
+    }
+    
 
     if(p){
 
@@ -49,6 +58,6 @@ char *ram_debug(const char *msg){
 void generic_irq_test(void){
 
     
-    ram_debug("GENERIC_IRQ");
+    ram_debug("GENERIC_IRQ", true);
     
 }

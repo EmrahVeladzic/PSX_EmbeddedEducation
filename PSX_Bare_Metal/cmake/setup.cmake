@@ -19,6 +19,7 @@ target_compile_options(
 
         -g
         -Wall
+        -Wextra
         -Wa,--strip-local-absolute
         -ffreestanding
         -fno-builtin
