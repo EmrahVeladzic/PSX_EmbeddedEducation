@@ -2,10 +2,10 @@
 #include <interrupts.h>
 #include <dma.h>
 
-bool spu_up = false;
+static bool spu_up = false;
 
-void spu_init(void){
-    if(spu_up){return;}
+bool spu_init(void){
+    if(spu_up){return true;}
 
     set_interrupt_channel(I_MASK_SPU,true);
     enable_dma_channel(DMA_CH_SPU);
@@ -40,13 +40,19 @@ void spu_init(void){
 
     spu_up = true;
 
+    return true;
+
 }
 
 
-bool load_audio(void *buffer, uint32_t blocks, uint16_t sample_rate, uint8_t voice){
-    if(!spu_up){spu_init();}
 
-    SPU_XFER_ADDR(0x1000 >> 3);
+
+bool copy_audio(void *buffer,uint32_t origin, uint32_t blocks){
+    if(!spu_up){
+        if(!spu_init()){return false;}
+    }
+
+    SPU_XFER_ADDR(origin << 1);
 
     SPU_CNT_WRITE(SPU_ENABLE | SPU_DEMUTE | SPU_DMA_W);
     while ((SPU_STAT_READ() & SPUSTAT_MODE_MASK) != SPU_DMA_W) {__asm__ volatile("");}
@@ -58,15 +64,16 @@ bool load_audio(void *buffer, uint32_t blocks, uint16_t sample_rate, uint8_t voi
     SPU_CNT_WRITE(SPU_ENABLE | SPU_DEMUTE);
     while ((SPU_STAT_READ() & SPUSTAT_MODE_MASK) != 0) {__asm__ volatile("");}
 
-    SPU_VOICE_START(voice, 0x1000 >> 3);
+    return true;
+
+}
+
+void spu_play(uint8_t voice, uint32_t origin, uint16_t sample_rate) {                
+    SPU_VOICE_START(voice, origin << 1);
     SPU_VOICE_PITCH(voice, SPU_PITCH_FROM_RATE(sample_rate));
     SPU_VOICE_ADSR(voice, 0x00FF, 0x0000);
     SPU_VOICE_VOLUME_BOTH(voice, 0x3FFF);
-
-    SPU_MASTER_VOLUME_BOTH(0x3FFF);
-
-    return true;
-
+    SPU_KEY_ON(voice);
 }
 
 void spu_irq(void){

@@ -82,11 +82,11 @@ typedef enum spu_xfer_type : uint16_t {
     SPU_XFER_REP8   = 0x000A
 } SPU_XFER_T;
 
-extern bool spu_up;
-
 void spu_irq(void);
-void spu_init(void);
+bool spu_init(void);
 
-bool load_audio(void *buffer, uint32_t blocks, uint16_t sample_rate, uint8_t voice);
+bool copy_audio(void *buffer,uint32_t origin, uint32_t blocks);
+
+void spu_play(uint8_t voice, uint32_t origin, uint16_t sample_rate);
 
 #endif

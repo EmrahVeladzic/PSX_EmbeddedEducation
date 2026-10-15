@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <hardware.h>
-
+#include <audio.h>
 
 int main(void){
 
@@ -35,32 +35,13 @@ int main(void){
         crray[i]=C[0];
     }
 
+    SPU_KEY_OFF(0);
+    SPU_Allocation *sfx = load_audio("ASSETS/RAVEN.WL",0);
+    
+    if(sfx){
+        spu_play(0,sfx->origin,sfx->sample_rate);
+    }
 
-    FILE *file = fopen("ASSETS/LEAVES.WL","rb");
-
-    fseek(file,2,SEEK_SET);
-
-    uint16_t sample_rate;
-
-    fread(&sample_rate,sizeof(uint16_t),1,file);
-
-    uint32_t block_count;
-
-    fread(&block_count,sizeof(uint32_t),1,file);
-
-    void *data = malloc((size_t)(block_count*16));
-
-    fread(data,16,block_count,file);
-
-    fclose(file);
-
-
-    load_audio(data,block_count,sample_rate,0);
-
-    free(data);
-
-
-    SPU_KEY_ON(0);
 
 
     while (1) {

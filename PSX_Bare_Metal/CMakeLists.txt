@@ -17,6 +17,8 @@ file(GLOB commonSrc
     src/hardware/*.s
     src/game/*.s
     src/game/*.c
+    src/psxlib/*.s
+    src/psxlib/*.c
 )
 
 add_library(common OBJECT ${commonSrc})
@@ -27,6 +29,7 @@ target_include_directories(
     src/libc
     src/hardware
     src/game
+    src/psxlib
 )
 
 
