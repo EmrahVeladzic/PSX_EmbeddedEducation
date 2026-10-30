@@ -166,7 +166,7 @@ SPU_Allocation *load_audio(const char *path, uint8_t channel){
                                 new_allc->sample_rate = s_rate;
                                 new_allc->channel = channel;
 
-                                if (!copy_audio(data, new_allc->origin, new_allc->block_count)) {
+                                if (!spu_upload(data, new_allc->origin, new_allc->block_count)) {
                                     clear_audio(new_allc);      
                                     new_allc = NULL;
                                 }

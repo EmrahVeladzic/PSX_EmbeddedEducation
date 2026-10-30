@@ -4,6 +4,7 @@
 #include <dma.h>
 #include <cdrom.h>
 #include <spu.h>
+#include <gpu.h>
 #include <interrupts.h>
 
 

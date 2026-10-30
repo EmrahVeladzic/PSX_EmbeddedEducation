@@ -47,7 +47,7 @@ bool spu_init(void){
 
 
 
-bool copy_audio(void *buffer,uint32_t origin, uint32_t blocks){
+bool spu_upload(void *buffer,uint32_t origin, uint32_t blocks){
     if(!spu_up){
         if(!spu_init()){return false;}
     }

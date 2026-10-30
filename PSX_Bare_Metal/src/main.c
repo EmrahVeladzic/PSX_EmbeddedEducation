@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <hardware.h>
 #include <audio.h>
+#include <texture.h>
 
 int main(void){
 
@@ -43,6 +44,34 @@ int main(void){
     }
 
 
+    GPU_Allocation *tex0 = load_texture("ASSETS/RAVEN.RPF");
+
+    if(!tex0){
+        ram_debug("raven texture fail",false);
+    }
+
+    GPU_Allocation *tex1 = load_texture("ASSETS/SKELE.RPF");
+
+    if(!tex1){
+        ram_debug("skeleton texture fail",false);
+    }
+
+    GPU_Allocation *tex2 = load_texture("ASSETS/FONT.RPF");
+
+    if(!tex2){
+        ram_debug("font texture fail",false);
+    }
+    
+    GPU_Allocation *tex3 = load_texture("ASSETS/CHARA.RPF");
+
+    if(!tex3){
+        ram_debug("character texture fail",false);
+    }
+
+    clear_texture(tex0);
+    clear_texture(tex1);
+    clear_texture(tex2);
+    clear_texture(tex3);
 
     while (1) {
         __asm__ volatile("");
