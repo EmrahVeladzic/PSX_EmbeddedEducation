@@ -26,6 +26,7 @@
 #define GP0_FILL(rgb,dest,size)do{GP0_WRITE(0x02000000|((rgb)&0xFFFFFF));GP0_WRITE((dest));GP0_WRITE((size));}while(false)
 
 #define GP0_DRAW_MODE(value){GP0_WRITE(0xE1000000|((value)&0x3FFF));}
+
 #define GP0_TEX_WINDOW(value){GP0_WRITE(0xE2000000|((value)&0xFFFFF));}
 #define GP0_DRAW_AREA_TL(x,y){GP0_WRITE(0xE3000000|(((y)&0x3FF)<<10)|((x)&0x3FF));}
 #define GP0_DRAW_AREA_BR(x,y){GP0_WRITE(0xE4000000|(((y)&0x3FF)<<10)|((x)&0x3FF));}
@@ -35,15 +36,17 @@
 #define GP0_VRAM_WRITE_BEGIN(dest,size)do{GP0_WRITE(0xA0000000);GP0_WRITE((dest));GP0_WRITE((size));}while(false)
 #define GP0_VRAM_WRITE_WORD(value){GP0_WRITE((value));}
 
-#define GPU_XY(x,y) ((uint32_t)((((uint32_t)(y)&0xFFFF)<<16)|((uint32_t)(x)&0xFFFF)))
-#define GPU_UV(u,v) ((uint32_t)((((uint32_t)(v)&0xFF)<<8)|((uint32_t)(u)&0xFF)))
-
 #define GPU_CMD_BUSY() ((GPUSTAT()&0x04000000)==0)
 #define GPU_VRAM_READ_READY() ((GPUSTAT()&0x08000000)!=0)
 #define GPU_DMA_READY() ((GPUSTAT()&0x10000000)!=0)
 
 #define GPU_WAIT_CMD_READY()do{while(GPU_CMD_BUSY());}while(false)
 #define GPU_WAIT_DMA_READY()do{while(!GPU_DMA_READY());}while(false)
+
+#define GPU_XY(x,y) ((uint32_t)((((uint32_t)(y)&0xFFFF)<<16)|((uint32_t)(x)&0xFFFF)))
+#define GPU_UV(u,v) ((uint32_t)((((uint32_t)(v)&0xFF)<<8)|((uint32_t)(u)&0xFF)))
+
+#define GPU_VRAM_XY(x,y) ((((uint32_t)(y) & 0x1FF) << 16) | ((uint32_t)(x) & 0x3FF))
 
 typedef enum gp1_display_mode : uint32_t {
     GPU_H256 = 0x00000000,
@@ -84,15 +87,28 @@ typedef enum gpu_status : uint32_t {
     GPUSTAT_ODD_LINE = 0x80000000
 } GPU_STATUS;
 
-typedef enum gp0_primitive : uint32_t {
-    GPU_POLY_F3 = 0x20000000,
-    GPU_POLY_FT3 = 0x24000000,
-    GPU_POLY_F4 = 0x28000000,
-    GPU_POLY_FT4 = 0x2C000000,
-    GPU_POLY_FT4_RAW = 0x2D000000,
-    GPU_SPRT = 0x64000000,
-    GPU_SPRT_RAW = 0x65000000
-} GPU_PRIMITIVE;
+typedef enum gpu_prim_flag : uint32_t {
+    GPU_PRIM_RAW      = 0x01000000,
+    GPU_PRIM_SEMI     = 0x02000000,
+    GPU_PRIM_TEXTURED = 0x04000000
+} GPU_PRIM_FLAG;
+
+typedef enum gpu_poly_flag : uint32_t {
+    GPU_POLY_QUAD     = 0x08000000,
+    GPU_POLY_GOURAUD  = 0x10000000
+} GPU_POLY_FLAG;
+
+typedef enum gpu_line_flag : uint32_t {
+    GPU_LINE_POLYLINE = 0x08000000,
+    GPU_LINE_GOURAUD  = 0x10000000
+} GPU_LINE_FLAG;
+
+typedef enum gpu_rect_size : uint32_t {
+    GPU_RECT_VAR      = 0x00000000,
+    GPU_RECT_1        = 0x08000000,
+    GPU_RECT_8        = 0x10000000,
+    GPU_RECT_16       = 0x18000000
+} GPU_RECT_SIZE;
 
 typedef struct gpu_sprite {
     uint32_t cmd;
@@ -112,5 +128,7 @@ void gpu_irq(void);
 bool gpu_init(void);
 
 bool gpu_upload(uint32_t dest, uint32_t size, const void *buffer, uint32_t halfwords);
+
+void execute_sprite_draw(uint32_t command, uint32_t xy, uint32_t clut_uv, uint32_t wh, uint16_t texpage);
 
 #endif

@@ -4,6 +4,18 @@
 #include <region.h>
 #include <interrupts.h>
 
+#define OT_SLOTS    2048          
+#define POOL_WORDS  16384    
+
+
+/*
+static uint32_t ot[2][OT_SLOTS];        
+static uint32_t pool[2][POOL_WORDS];    
+static uint32_t pool_used; 
+
+*/
+
+static uint16_t current_draw_mode = 0;
 
 static bool gpu_up = false;
 
@@ -16,9 +28,13 @@ bool gpu_init(void){
     GP1_RESET();
 
     set_interrupt_channel(I_MASK_GPU,true);
-    
+
+    GP0_DRAW_MODE(0);
+    current_draw_mode = 0;
+   
 
     enable_dma_channel(DMA_CH_GPU);
+    enable_dma_channel(DMA_CH_OTC);
     GP1_DMA_DIR(2);
 
     GP1_DISPLAY_MODE(SCREEN_H_MODE|SCREEN_V_MODE|REGION_VIDEO_MODE|GPU_15BIT);
@@ -31,10 +47,11 @@ bool gpu_init(void){
     GP0_DRAW_AREA_BR(SCREEN_W-1,SCREEN_H-1);
     GP0_DRAW_OFFSET(0,0);
 
-    GP0_FILL(0x000000,GPU_XY(0,0),GPU_XY(SCREEN_W,SCREEN_H));
+    GP0_FILL(0x000000,GPU_VRAM_XY(0,0),GPU_XY(SCREEN_W,SCREEN_H));
     GPU_WAIT_CMD_READY();
 
     GP1_DISPLAY_ENABLE(true);
+    
 
     gpu_up = true;
 
@@ -67,6 +84,23 @@ bool gpu_upload(uint32_t dest, uint32_t size, const void *buffer, uint32_t halfw
 
     return true;
 }
+
+void execute_sprite_draw(uint32_t command, uint32_t xy, uint32_t clut_uv, uint32_t wh, uint16_t texpage){
+
+    GPU_WAIT_CMD_READY();
+
+    if(current_draw_mode!=texpage){
+        GP0_DRAW_MODE(texpage);
+        current_draw_mode=texpage;
+    }
+
+    GP0_WRITE(command);
+    GP0_WRITE(xy);
+    GP0_WRITE(clut_uv);
+    GP0_WRITE(wh);
+
+}
+
 
 void gpu_irq(void){
     GP1_ACK_IRQ();

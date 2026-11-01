@@ -25,5 +25,6 @@ GPU_Allocation *load_texture(const char *path);
 
 void clear_texture(GPU_Allocation *texture);
 
+void draw_sprite(GPU_Allocation *texture, GPU_PRIM_FLAG flag, int16_t x, int16_t y, uint8_t u, uint8_t v, uint16_t width, uint16_t height, uint8_t r, uint8_t g, uint8_t b);
 
 #endif

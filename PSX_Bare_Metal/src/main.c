@@ -46,32 +46,30 @@ int main(void){
 
     GPU_Allocation *tex0 = load_texture("ASSETS/RAVEN.RPF");
 
-    if(!tex0){
-        ram_debug("raven texture fail",false);
-    }
+   
 
     GPU_Allocation *tex1 = load_texture("ASSETS/SKELE.RPF");
 
-    if(!tex1){
-        ram_debug("skeleton texture fail",false);
-    }
+   
 
     GPU_Allocation *tex2 = load_texture("ASSETS/FONT.RPF");
 
-    if(!tex2){
-        ram_debug("font texture fail",false);
-    }
-    
+   
     GPU_Allocation *tex3 = load_texture("ASSETS/CHARA.RPF");
 
-    if(!tex3){
-        ram_debug("character texture fail",false);
+   
+    if(tex0){
+        draw_sprite(tex0,GPU_PRIM_TEXTURED|GPU_PRIM_RAW,0,0,0,0,128,128,0,0,0);
     }
 
-    clear_texture(tex0);
-    clear_texture(tex1);
-    clear_texture(tex2);
-    clear_texture(tex3);
+    if(tex1){
+        draw_sprite(tex1,GPU_PRIM_TEXTURED|GPU_PRIM_RAW,128,0,0,0,128,128,0,0,0);
+    }
+
+    if(tex3){
+        draw_sprite(tex3,GPU_PRIM_TEXTURED|GPU_PRIM_RAW,0,128,0,0,128,128,0,0,0);
+    }
+   
 
     while (1) {
         __asm__ volatile("");

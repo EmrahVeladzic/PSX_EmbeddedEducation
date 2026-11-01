@@ -29,7 +29,7 @@ static inline bool init_spu_ram(){
 
 }
 
-SPU_Allocation *spu_malloc(uint32_t block_count){
+static SPU_Allocation *spu_malloc(uint32_t block_count){
 
     SPU_Allocation *new_allc = (SPU_Allocation*) malloc(sizeof(SPU_Allocation));
 

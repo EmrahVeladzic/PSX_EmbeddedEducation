@@ -13,7 +13,7 @@ static GPU_Allocation *TextureBase = NULL;
 
 
 
-GPU_Allocation *gpu_malloc(int32_t dest_tex, int32_t size_tex, int32_t dest_clut, int32_t size_clut){
+static GPU_Allocation *gpu_malloc(int32_t dest_tex, int32_t size_tex, int32_t dest_clut, int32_t size_clut){
 
     GPU_Allocation *new_allc = (GPU_Allocation*) malloc(sizeof(GPU_Allocation));
 
@@ -278,5 +278,21 @@ void clear_texture(GPU_Allocation *texture){
     free(texture);
 
     return;
+}
+
+void draw_sprite(GPU_Allocation *texture, GPU_PRIM_FLAG flag, int16_t x, int16_t y, uint8_t u, uint8_t v, uint16_t width, uint16_t height, uint8_t r, uint8_t g, uint8_t b){
+
+
+    uint32_t px_per_hw = (texture->texpage & 0x80)? GPU_8BPP : GPU_4BPP;
+    uint32_t u0 = ((VRAM_X(texture->dest_tex) - (texture->texpage & 0xF) * 64) << px_per_hw);
+    uint32_t v0 = VRAM_Y(texture->dest_tex) - ((texture->texpage & 0x10) ? 256 : 0);
+
+    uint32_t command = 0x60000000 | (flag & 0x1F000000) | ((uint32_t)b << 16)| ((uint32_t)g << 8) | r;
+
+    uint32_t xy = GPU_XY(x, y);
+    uint32_t clut_uv = ((uint32_t)texture->clut_word << 16) | GPU_UV(u0 + u, v0 + v);
+    uint32_t wh = GPU_XY(width, height);
+
+    execute_sprite_draw(command, xy, clut_uv, wh, texture->texpage);
 }
 
