@@ -1,7 +1,7 @@
 #ifndef F_MATH
 #define F_MATH
 
-#include <stdint.h>
+#include <gte.h>
 
 #define FIX_SHL(in,n) ((int32_t)(in)*(int32_t)(1<<(n)))
 #define FIX_SHR(in,n) ((int32_t)(in)>>(n))
@@ -20,6 +20,10 @@ typedef enum coll_ax_r : uint32_t {
     COLLISION_INSIDE = 0xFFFFFFFF,
     COLLISION_UNDEFINED = 0x80000000,
 } COLLISION_AXIS_RESULT;
+
+int16_t fx_sin(int16_t a);
+
+int16_t fx_cos(int16_t a);
 
 
 static inline COLLISION_AXIS_RESULT point_match_test (int32_t a_x, int32_t a_y, int32_t a_z, int32_t b_x, int32_t b_y, int32_t b_z){

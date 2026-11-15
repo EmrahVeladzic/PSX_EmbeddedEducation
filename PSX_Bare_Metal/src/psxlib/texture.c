@@ -80,8 +80,6 @@ GPU_Allocation *load_texture(const char *path){
         return NULL;
     }
 
-
-
     GPU_Allocation *allc = TextureBase;
 
     while (allc)

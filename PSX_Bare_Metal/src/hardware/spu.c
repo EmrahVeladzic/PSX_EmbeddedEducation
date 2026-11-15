@@ -38,13 +38,29 @@ bool spu_init(void){
 
     SPU_REVERB_VOLUME_BOTH(0);
 
+    for(uint32_t addr = 0x1000; addr < 0x80000; addr += 64){
+
+        SPU_XFER_ADDR(addr >> 3);
+
+        for(int i = 0; i < 32; i++){
+            SPU_FIFO_WRITE(0);
+        }
+
+        SPU_CNT_WRITE(SPU_ENABLE | SPU_DEMUTE | SPU_MANUAL_W);
+        while ((SPU_STAT_READ() & SPUSTAT_MODE_MASK) != SPU_MANUAL_W) {__asm__ volatile("");}
+        while (SPU_STAT_READ() & SPUSTAT_XFER_BUSY) {__asm__ volatile("");}
+
+        SPU_CNT_WRITE(SPU_ENABLE | SPU_DEMUTE);
+        while ((SPU_STAT_READ() & SPUSTAT_MODE_MASK) != 0) {__asm__ volatile("");}
+    }
+
     spu_up = true;
 
     return true;
 
 }
 
-
+static volatile bool spu_irq_hit = false;
 
 
 bool spu_upload(void *buffer,uint32_t origin, uint32_t blocks){
@@ -52,14 +68,18 @@ bool spu_upload(void *buffer,uint32_t origin, uint32_t blocks){
         if(!spu_init()){return false;}
     }
 
+    SPU_IRQ_ADDR(((origin + blocks) << 1) - 1);
+
     SPU_XFER_ADDR(origin << 1);
 
-    SPU_CNT_WRITE(SPU_ENABLE | SPU_DEMUTE | SPU_DMA_W);
+    SPU_CNT_WRITE(SPU_ENABLE | SPU_DEMUTE | SPU_IRQ | SPU_DMA_W);
     while ((SPU_STAT_READ() & SPUSTAT_MODE_MASK) != SPU_DMA_W) {__asm__ volatile("");}
 
     start_dma_transfer(DMA_CH_SPU, buffer, SPU_DMA_BCR(blocks), DMA_TO_DEVICE | DMA_SYNC_SLICE | DMA_START, true);
 
-    while (SPU_STAT_READ() & SPUSTAT_XFER_BUSY) {__asm__ volatile("");}
+    while (!spu_irq_hit) {__asm__ volatile("");}
+
+    spu_irq_hit=false;
 
     SPU_CNT_WRITE(SPU_ENABLE | SPU_DEMUTE);
     while ((SPU_STAT_READ() & SPUSTAT_MODE_MASK) != 0) {__asm__ volatile("");}
@@ -80,4 +100,5 @@ void spu_irq(void){
     uint16_t cnt = SPU_CNT_READ();
     SPU_CNT_WRITE(cnt & ~SPU_IRQ);   
     SPU_CNT_WRITE(cnt |  SPU_IRQ);  
+    spu_irq_hit = true;
 }

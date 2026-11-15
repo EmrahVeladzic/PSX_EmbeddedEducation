@@ -49,6 +49,8 @@
 #define SPU_REVERB_BASE(addr)do{_MMIO16(0x1F801DA2)=(addr);}while(false)
 #define SPU_IRQ_ADDR(addr)do{_MMIO16(0x1F801DA4)=(addr);}while(false)
 
+#define SPU_FIFO_WRITE(value)do{_MMIO16(0x1F801DA8)=(value);}while(false)
+
 typedef enum spucnt_value : uint16_t{
     SPU_OFF = 0x0000,
     SPU_ENABLE = 0x8000,

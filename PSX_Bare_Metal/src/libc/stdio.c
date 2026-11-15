@@ -263,6 +263,8 @@ FILE *fopen(const char *path, const char *mode){
 }
 
 int fseek(FILE *fptr, long offset, int origin) {
+    if(!offset && origin == SEEK_CUR){return 0;}
+
     long off = fptr->current_offset;
 
     switch (origin) {
@@ -282,7 +284,7 @@ int fseek(FILE *fptr, long offset, int origin) {
     if (off < 0 || off > (long)fptr->len_bytes) { return 1; }
 
     uint32_t lba = fptr->lba +  (off / DATA_SECTOR_SIZE);
-    if (current_lba != lba) {
+    if (off < (long)fptr->len_bytes && current_lba != lba) {
         if (!read_lba(lba)) { return 2; }
     }
 
@@ -336,5 +338,6 @@ long ftell(FILE *fptr){
 
 int fclose(FILE *fptr){
     free(fptr);
+    cdrom_issue_cmd(CD_CMD_STOP,0,NULL,CD_IRQ_S_CMD_FIN,true);
     return 0;
 }
