@@ -92,3 +92,28 @@ COLLISION_AXIS_RESULT rect_test(int32_t a_north, int32_t a_west, int32_t a_south
 
     return (north<<6)|(west<<4)|(south<<2)|east;
 }
+
+
+AFFINE to_affine(const TRANSFORM *transform){
+
+    VEC3 tempvec = get_vector();
+    MAT3X3 tempmat = get_matrix();
+
+
+    AFFINE out = create_set_affine(transform);
+
+    load_matrix(&tempmat);
+    load_vector(&tempvec);
+
+    return out;
+}
+
+AFFINE multiply_affine(const AFFINE *A, const AFFINE *b){
+
+    load_vector(&A->translation);
+    load_matrix(&A->rotation_scale);
+
+    AFFINE out = multiply_with_current(b);
+    return out;
+
+}

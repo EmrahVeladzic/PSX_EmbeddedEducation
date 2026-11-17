@@ -36,5 +36,8 @@ static inline COLLISION_AXIS_RESULT point_match_test (int32_t a_x, int32_t a_y, 
 COLLISION_AXIS_RESULT rect_test(int32_t a_north, int32_t a_west, int32_t a_south, int32_t a_east, int32_t b_north, int32_t b_west, int32_t b_south, int32_t b_east , bool self_contained);
 
 
+AFFINE to_affine(const TRANSFORM *transform);
+
+AFFINE multiply_affine(const AFFINE *A, const AFFINE *b);
 
 #endif

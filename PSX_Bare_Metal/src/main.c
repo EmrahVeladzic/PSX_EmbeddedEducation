@@ -1,14 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <fxmath.h>
 #include <hardware.h>
+
 #include <audio.h>
 #include <texture.h>
+#include <model.h>
+
 
 int main(void){
 
     int8_t *array = malloc(48);
-
-
 
     const char *A = "AAAAA";
     const char *B = "BBBBB";  
@@ -20,7 +22,7 @@ int main(void){
 
     array = realloc(array,24);
 
-    delay_microseconds(5000000);
+    delay_microseconds(5000);
 
     int8_t *crray = malloc(8);
 
@@ -69,7 +71,19 @@ int main(void){
     if(tex3){
         draw_sprite(tex3,GPU_PRIM_TEXTURED|GPU_PRIM_RAW,0,128,0,0,128,128,0,0,0);
     }
+
+    clear_texture(tex2);
    
+
+    TRANSFORM a = { .translation = {1000, 2000, 3000}, .rotation = {0, 0, 2896, 2896}, .scale = {4096, 4096, 4096} };
+    TRANSFORM b = { .translation = {500, 0, 0},        .rotation = {0, 0, 0, 4096},    .scale = {8192, 4096, 4096} };
+
+    AFFINE aA = create_set_affine(&a);
+    AFFINE aB = create_set_affine(&b);
+    AFFINE aC = multiply_affine(&aA, &aB);
+
+    load_matrix(&aC.rotation_scale);
+    load_vector(&aC.translation);
 
     while (1) {
         __asm__ volatile("");

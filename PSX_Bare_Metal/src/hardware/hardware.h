@@ -5,6 +5,7 @@
 #include <cdrom.h>
 #include <spu.h>
 #include <gpu.h>
+#include <gte.h>
 #include <interrupts.h>
 
 

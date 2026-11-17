@@ -3,7 +3,7 @@
 
 #include <gte.h>
 
-#define MDL_NO_DATA 255;
+#define MDL_NO_DATA 255
 
 typedef enum ast_flag : uint8_t{
 

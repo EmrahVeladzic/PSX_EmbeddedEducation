@@ -70,6 +70,13 @@ typedef struct transform{
 
 }TRANSFORM;
 
+typedef struct affine{
+
+    VEC3 translation;
+    MAT3X3 rotation_scale;
+
+}AFFINE;
+
 typedef struct gte_msh_args{
 
     VTX8 *vertices;
@@ -81,6 +88,19 @@ typedef struct gte_msh_args{
 }MSH_ARGS;
 
 
+void load_transform(const TRANSFORM *trans);
+
+void load_matrix(const MAT3X3 *matrix);
+
+void load_vector(const VEC3 *vector);
+
+MAT3X3 get_matrix(void);
+
+VEC3 get_vector(void);
+
+AFFINE multiply_with_current(const AFFINE *input);
+
+AFFINE create_set_affine(const TRANSFORM *transform);
 
 
 #endif
