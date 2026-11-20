@@ -10,7 +10,7 @@
 vblank_interrupt:
     addiu  $sp, $sp, -24
     sw     $ra, 16($sp)        
-    jal    generic_irq_test
+    jal    vblank_irq
     nop
     lw     $ra, 16($sp)
     addiu  $sp, $sp, 24

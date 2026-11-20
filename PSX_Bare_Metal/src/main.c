@@ -1,95 +1,51 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <fxmath.h>
+#include <scene.h>
 #include <hardware.h>
-
-#include <audio.h>
-#include <texture.h>
-#include <model.h>
-
 
 int main(void){
 
-    int8_t *array = malloc(48);
-
-    const char *A = "AAAAA";
-    const char *B = "BBBBB";  
-    const char *C = "CCCCC";
-
-    for (size_t i = 0; i < 48; i++){
-        array[i]=A[0];
-    }  
-
-    array = realloc(array,24);
-
-    delay_microseconds(5000);
-
-    int8_t *crray = malloc(8);
-
-    int8_t *brray = malloc(48);
-
-    for (size_t i = 0; i < 48; i++)
-    {
-        brray[i]=B[0];
-    }
-
-    for (size_t i = 0; i < 8; i++)
-    {
-        crray[i]=C[0];
-    }
+    set_screen_offset(FIX_SHL(SCREEN_W/2,16),FIX_SHL(SCREEN_H/2,16),PROJ_DIST,Z_SCALE_FACTOR);
 
     SPU_KEY_OFF(0);
-    SPU_Allocation *sfx = load_audio("ASSETS/RAVEN.WL",0);
+   
+    setup();
+
+    int last_frame = get_frame();
+
+    set_interrupt_channel(I_MASK_VBLANK,true);
+
+
+
+    for (int f = last_frame;; f = get_frame()){
+        
+        tick(last_frame);
+        last_frame = f;
+
+        DMA_SYNC(DMA_CH_GPU);
+        GPU_WAIT_CMD_READY();
+
+        release = false;
+
+        while (!release)
+        {
+            __asm__ volatile ("");
+        }
+        
+        uint16_t draw_x = second_framebuffer ? F_BUFF_X0 : F_BUFF_X1;
+        uint16_t draw_y = second_framebuffer ? F_BUFF_Y0 : F_BUFF_Y1;
+        uint16_t show_x = second_framebuffer ? F_BUFF_X1 : F_BUFF_X0;
+        uint16_t show_y = second_framebuffer ? F_BUFF_Y1 : F_BUFF_Y0;
+
+        GP1_DISPLAY_START(show_x, show_y);
+
+        GP0_DRAW_AREA_TL(draw_x, draw_y);
+        GP0_DRAW_AREA_BR(draw_x + SCREEN_W - 1, draw_y + SCREEN_H - 1);
+        GP0_DRAW_OFFSET(draw_x, draw_y);
+
+        submit_scene();
+
+        second_framebuffer=!second_framebuffer;
+    }
     
-    if(sfx){
-        spu_play(0,sfx->origin,sfx->sample_rate);
-    }
-
-
-    GPU_Allocation *tex0 = load_texture("ASSETS/RAVEN.RPF");
-
-   
-
-    GPU_Allocation *tex1 = load_texture("ASSETS/SKELE.RPF");
-
-   
-
-    GPU_Allocation *tex2 = load_texture("ASSETS/FONT.RPF");
-
-   
-    GPU_Allocation *tex3 = load_texture("ASSETS/CHARA.RPF");
-
-   
-    if(tex0){
-        draw_sprite(tex0,GPU_PRIM_TEXTURED|GPU_PRIM_RAW,0,0,0,0,128,128,0,0,0);
-    }
-
-    if(tex1){
-        draw_sprite(tex1,GPU_PRIM_TEXTURED|GPU_PRIM_RAW,128,0,0,0,128,128,0,0,0);
-    }
-
-    if(tex3){
-        draw_sprite(tex3,GPU_PRIM_TEXTURED|GPU_PRIM_RAW,0,128,0,0,128,128,0,0,0);
-    }
-
-    clear_texture(tex2);
-   
-
-    TRANSFORM a = { .translation = {1000, 2000, 3000}, .rotation = {0, 0, 2896, 2896}, .scale = {4096, 4096, 4096} };
-    TRANSFORM b = { .translation = {500, 0, 0},        .rotation = {0, 0, 0, 4096},    .scale = {8192, 4096, 4096} };
-
-    AFFINE aA = create_set_affine(&a);
-    AFFINE aB = create_set_affine(&b);
-    AFFINE aC = multiply_affine(&aA, &aB);
-
-    load_matrix(&aC.rotation_scale);
-    load_vector(&aC.translation);
-
-    while (1) {
-        __asm__ volatile("");
-
-
-    }
 
     return 0;
 }

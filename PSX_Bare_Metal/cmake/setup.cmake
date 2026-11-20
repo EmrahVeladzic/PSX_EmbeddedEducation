@@ -17,6 +17,9 @@ target_compile_features(
 target_compile_options(
     compilation_flags INTERFACE
 
+        -O2
+        -fno-tree-loop-distribute-patterns
+        -fno-strict-aliasing
         -g
         -Wall
         -Wextra

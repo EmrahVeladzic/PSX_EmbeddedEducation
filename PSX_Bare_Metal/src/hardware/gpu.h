@@ -123,6 +123,9 @@ typedef enum gpu_bpp : uint8_t {
     GPU_4BPP = 0x2
 } GPU_BPP;
 
+extern uint32_t s_clear_color;
+
+
 void gpu_irq(void);
 
 bool gpu_init(void);
@@ -130,5 +133,7 @@ bool gpu_init(void);
 bool gpu_upload(uint32_t dest, uint32_t size, const void *buffer, uint32_t halfwords);
 
 void execute_sprite_draw(uint32_t command, uint32_t xy, uint32_t clut_uv, uint32_t wh, uint16_t texpage);
+
+void execute_scene_draw(uint32_t *ot, size_t count, uint16_t x, uint16_t y);
 
 #endif

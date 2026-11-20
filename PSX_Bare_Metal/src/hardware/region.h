@@ -4,6 +4,12 @@
 #define REGION_PAL  1
 #define REGION_NTSC 2
 
+#define F_BUFF_X0 0
+#define F_BUFF_X1 0
+
+#define F_BUFF_Y0 0
+#define F_BUFF_Y1 256
+
 #ifndef REGION
 #define REGION REGION_PAL
 #endif

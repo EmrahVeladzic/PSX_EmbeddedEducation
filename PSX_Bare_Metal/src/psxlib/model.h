@@ -34,6 +34,7 @@ typedef struct anim_track{
 typedef struct joint{
 
     TRANSFORM init_trans;
+    AFFINE active_affine;
 
     ANIM_TRACK *tracks;
 

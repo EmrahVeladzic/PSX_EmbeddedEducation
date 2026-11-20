@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define PROJ_DIST 275
+#define Z_SCALE_FACTOR 341
+
 typedef struct vec3{
 
     int32_t x;
@@ -87,6 +90,16 @@ typedef struct gte_msh_args{
 
 }MSH_ARGS;
 
+typedef struct draw_ctx{
+    uint32_t *ot;           
+    uint32_t *packet;       
+    uint32_t *packet_end;   
+    uint32_t color_cmd;     
+    uint32_t clut;          
+    uint32_t tpage;         
+}DRAW_CTX;
+
+void load_affine(const AFFINE *aff);
 
 void load_transform(const TRANSFORM *trans);
 
@@ -98,9 +111,14 @@ MAT3X3 get_matrix(void);
 
 VEC3 get_vector(void);
 
+AFFINE get_affine(void);
+
 AFFINE multiply_with_current(const AFFINE *input);
 
 AFFINE create_set_affine(const TRANSFORM *transform);
 
+void set_screen_offset(int32_t ofx, int32_t ofy, uint16_t h, uint16_t zsf3);
+
+uint32_t *queue_mesh(const MSH_ARGS *mesh, const DRAW_CTX *ctx);
 
 #endif

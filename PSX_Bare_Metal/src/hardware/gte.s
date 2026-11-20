@@ -5,10 +5,16 @@
 .globl load_vector
 .globl load_matrix
 .globl multiply_with_current
+.globl set_screen_offset
+.globl queue_mesh
 .text
+
+.set OT_SLOTS, 2048
 
 .set GTE_RT_IR,     0x049E012
 .set GTE_RT_IR_TR,  0x0498012
+.set GTE_RTPT,  0x0280030
+.set GTE_AVSZ3, 0x158002D
 
 load_transform:
 
@@ -326,3 +332,166 @@ multiply_with_current:
 
     jr $ra
     move $v0, $a0   
+
+
+set_screen_offset:
+
+    ctc2 $a0, $24
+    ctc2 $a1, $25
+    ctc2  $a3, $29
+
+    jr $ra
+    ctc2 $a2, $26
+
+
+queue_mesh:
+
+    addiu $sp, $sp, -16
+    sw   $s0, 0($sp)
+    sw   $s1, 4($sp)
+    sw   $s2, 8($sp)
+    sw   $s3, 12($sp)
+
+    lhu $t0, 12($a0) #c_vtx
+    lw $t1, 4($a1) #packet_cursor
+    beqz $t0, qm_done
+    lw $t3, 0($a0) #vtx_bfr
+    lhu $t0, 14($a0) #c_tris
+    lw $t2, 8($a1) #packet_end
+    beqz $t0, qm_done
+    lw $t4, 8($a0) #ind_bfr
+    beq $t1, $t2, qm_done 
+    lw $t5, 0($a1) #o_table
+    lw $t6, 12($a1) #color_cmd 
+    lw $t7, 16($a1) #clut 
+    lw $t8, 20($a1) #tpage 
+    
+    srl $t9, $t6, 26
+    lui $s0, 0x00FF
+    andi $t9, $t9, 0x1 #textured
+
+    ori $s0, $s0, 0xFFFF #24-bit mask
+
+    
+qm_loop:
+
+    lhu $s1, 0($t4) #index 0
+    lhu $s2, 2($t4) #index 1
+    lhu $s3, 4($t4) #index 2
+
+    sll $s1, $s1, 3 
+    sll $s2, $s2, 3
+    sll $s3, $s3, 3
+
+    addu $s1, $s1, $t3 #&vtx0
+    addu $s2, $s2, $t3 #&vtx1
+    addu $s3, $s3, $t3 #&vtx2
+
+    lwc2 $0, 0($s1)          
+    lwc2 $1, 4($s1)              
+    lwc2 $2, 0($s2)             
+    lwc2 $3, 4($s2)             
+    lwc2 $4, 0($s3)             
+    lwc2 $5, 4($s3)             
+
+    lhu  $a2, 6($s1) #uv0
+    lhu  $a3, 6($s2) #uv1       
+
+    cop2 GTE_RTPT            
+
+    lhu  $v1, 6($s3) #uv2
+
+    or   $a2, $a2, $t7 #clut         
+    or   $a3, $a3, $t8 #tpage    
+
+    addiu $t4, $t4, 6 #ind_bfr += 3   
+ 
+    cop2 GTE_AVSZ3           
+   
+    mfc2 $s1, $7
+    addiu $t0, $t0, -1 #triangle_done
+
+    beqz $s1, qm_next
+
+
+    sltiu $v0, $s1, OT_SLOTS
+    bnez $v0, qm_valid
+
+    nop
+    li  $s1, OT_SLOTS-1
+
+qm_valid:
+
+    sll $s1, $s1, 2
+    addu $s1, $s1, $t5
+
+    addiu $s2, $t1, 32
+    sltu  $s2, $t2, $s2
+    bnez  $s2, qm_done 
+    nop
+
+    lw $s3, 0($s1)
+    beqz $t9, qm_untextured    
+
+    sw  $t6, 4($t1) #write_packet_cmd   
+
+    swc2 $12, 8($t1)    
+    sw  $a2 ,12($t1)
+    swc2 $13, 16($t1)           
+    sw   $a3, 20($t1)        
+    swc2  $14, 24($t1)
+    sw   $v1, 28($t1)
+    and $v1, $s3, $s0 #masking
+
+    lui $a2, 0x0700 #textured_tag
+    or  $a2, $a2, $v1
+
+    sw  $a2, 0($t1) 
+    xor $s3, $s3, $v1
+    and $a3, $t1, $s0
+    or $s3, $s3, $a3
+
+    sw $s3, 0($s1)
+
+    b    qm_next
+    addiu $t1, $t1, 32    
+
+
+qm_untextured:
+
+    swc2 $12, 8($t1)         
+    swc2 $13, 12($t1)        
+    swc2 $14, 16($t1)        
+    and $v1, $s3, $s0 #masking
+
+    lui $a2, 0x0400 #flat_tag
+    or  $a2, $a2, $v1
+    sw  $a2, 0($t1) 
+
+    xor $s3, $s3, $v1
+    and $a3, $t1, $s0
+    or $s3, $s3, $a3
+
+    sw $s3, 0($s1)
+    addiu $t1, $t1, 20   
+
+
+qm_next:
+
+    bnez $t0, qm_loop
+    nop
+
+qm_done: 
+
+    move $v0, $t1
+
+    lw   $s0, 0($sp)
+    lw   $s1, 4($sp)
+    lw   $s2, 8($sp)
+    lw   $s3, 12($sp)
+
+    jr $ra
+    addiu $sp, $sp, 16
+
+
+

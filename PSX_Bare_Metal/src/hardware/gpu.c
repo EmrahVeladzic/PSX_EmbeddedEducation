@@ -4,20 +4,12 @@
 #include <region.h>
 #include <interrupts.h>
 
-#define OT_SLOTS    2048          
-#define POOL_WORDS  16384    
-
-
-/*
-static uint32_t ot[2][OT_SLOTS];        
-static uint32_t pool[2][POOL_WORDS];    
-static uint32_t pool_used; 
-
-*/
 
 static uint16_t current_draw_mode = 0;
 
 static bool gpu_up = false;
+
+uint32_t s_clear_color = 0x000000;
 
 bool gpu_init(void){
 
@@ -29,8 +21,8 @@ bool gpu_init(void){
 
     set_interrupt_channel(I_MASK_GPU,true);
 
-    GP0_DRAW_MODE(0);
-    current_draw_mode = 0;
+    GP0_DRAW_MODE(GPU_DITHER);
+    current_draw_mode = GPU_DITHER;
    
 
     enable_dma_channel(DMA_CH_GPU);
@@ -41,13 +33,16 @@ bool gpu_init(void){
     GP1_DISPLAY_RANGE_H(DISPLAY_START_X,DISPLAY_START_X+(SCREEN_W*8));
     GP1_DISPLAY_RANGE_V(DISPLAY_CENTER_Y-(SCREEN_H/2),DISPLAY_CENTER_Y+(SCREEN_H/2));
 
-    GP1_DISPLAY_START(0,0);
+    GP1_DISPLAY_START(F_BUFF_X0, F_BUFF_Y0);
 
-    GP0_DRAW_AREA_TL(0,0);
-    GP0_DRAW_AREA_BR(SCREEN_W-1,SCREEN_H-1);
-    GP0_DRAW_OFFSET(0,0);
+    GP0_DRAW_AREA_TL(F_BUFF_X1,F_BUFF_Y1);
+    GP0_DRAW_AREA_BR(F_BUFF_X1 + SCREEN_W - 1, F_BUFF_Y1 + SCREEN_H - 1);
+    GP0_DRAW_OFFSET(F_BUFF_X1, F_BUFF_Y1);
 
-    GP0_FILL(0x000000,GPU_VRAM_XY(0,0),GPU_XY(SCREEN_W,SCREEN_H));
+
+    GP0_FILL(s_clear_color & 0x00FFFFFF, GPU_VRAM_XY(F_BUFF_X0, F_BUFF_Y0), GPU_XY(SCREEN_W, SCREEN_H));
+    GPU_WAIT_CMD_READY();
+    GP0_FILL(s_clear_color & 0x00FFFFFF, GPU_VRAM_XY(F_BUFF_X1, F_BUFF_Y1), GPU_XY(SCREEN_W, SCREEN_H));
     GPU_WAIT_CMD_READY();
 
     GP1_DISPLAY_ENABLE(true);
@@ -87,17 +82,39 @@ bool gpu_upload(uint32_t dest, uint32_t size, const void *buffer, uint32_t halfw
 
 void execute_sprite_draw(uint32_t command, uint32_t xy, uint32_t clut_uv, uint32_t wh, uint16_t texpage){
 
+    if(!gpu_init()){
+        return;
+    }
+
+
     GPU_WAIT_CMD_READY();
 
-    if(current_draw_mode!=texpage){
-        GP0_DRAW_MODE(texpage);
-        current_draw_mode=texpage;
+    uint16_t mode = texpage|GPU_DITHER;
+
+    if(current_draw_mode!=mode){
+        GP0_DRAW_MODE(mode);
+        current_draw_mode=mode;
     }
 
     GP0_WRITE(command);
     GP0_WRITE(xy);
     GP0_WRITE(clut_uv);
     GP0_WRITE(wh);
+
+}
+
+void execute_scene_draw(uint32_t *ot, size_t count, uint16_t x, uint16_t y){
+
+    if(!gpu_init()){
+        return;
+    }
+
+    GPU_WAIT_CMD_READY();
+    GP0_FILL(s_clear_color & 0x00FFFFFF,GPU_VRAM_XY(x,y),GPU_XY(SCREEN_W,SCREEN_H));
+    GPU_WAIT_CMD_READY();
+
+    start_dma_transfer(DMA_CH_GPU, &ot[count-1], 0, DMA_TO_DEVICE | DMA_SYNC_LIST | DMA_START, false);
+
 
 }
 
