@@ -14,19 +14,10 @@
 #include <audio.h>
 #include <texture.h>
 #include <model.h>
+#include <spawner.h>
 
 #define MAX_ACTORS 16
 
-typedef struct w_actor{
-    
-    uint32_t type;
-    uint32_t state;
-    void (*tick)(struct w_actor *self, int last_frame); 
-    AST_Allocation *asset;
-    GPU_Allocation *texture;
-    TRANSFORM actor_transform;
-
-}ACTOR;
 
 void vblank_irq(void);
 

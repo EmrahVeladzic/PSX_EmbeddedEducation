@@ -149,7 +149,7 @@ AST_Allocation *load_asset(const char *path){
 
                     fread(&temp_byte,1,1,file);
 
-                    temp_allc = attempt_allocation(temp_byte * sizeof(MESH));
+                    temp_allc = attempt_allocation(temp_byte * sizeof(MSH_ARGS));
 
                     if(temp_allc){
                         new_allc->model->mesh_count=temp_byte;
@@ -167,17 +167,18 @@ AST_Allocation *load_asset(const char *path){
 
                             new_allc->model->meshes[i].bone_index=temp_byte;
                             
-                            fseek(file,1,SEEK_CUR);
+                            fread(&temp_byte,1,1,file);
+                            new_allc->model->meshes[i].material=temp_byte;
 
                             fread(&temp_ushort,2,1,file);
 
-                            new_allc->model->meshes[i].data.vertex_count = temp_ushort;
+                            new_allc->model->meshes[i].vertex_count = temp_ushort;
 
                             temp_allc = attempt_allocation(temp_ushort * sizeof(VTX8));                           
                                 
                             if(fread(temp_allc,sizeof(VTX8),temp_ushort,file)==temp_ushort){
 
-                                new_allc->model->meshes[i].data.vertices=temp_allc;
+                                new_allc->model->meshes[i].vertices=temp_allc;
 
                                 fread(&temp_ushort,2,1,file);
 
@@ -187,19 +188,19 @@ AST_Allocation *load_asset(const char *path){
 
                                 if(fread(temp_allc,sizeof(NRM8),temp_ushort,file)==temp_ushort){
 
-                                    new_allc->model->meshes[i].data.normals=temp_allc;
+                                    new_allc->model->meshes[i].normals=temp_allc;
 
                                     fread(&temp_ushort,2,1,file);
 
                                     fseek(file,2,SEEK_CUR);
 
-                                    new_allc->model->meshes[i].data.triangle_count=temp_ushort/3;
+                                    new_allc->model->meshes[i].triangle_count=temp_ushort/3;
 
                                     temp_allc = attempt_allocation(temp_ushort * 2);
 
                                     if(fread(temp_allc,2,temp_ushort,file)==temp_ushort){
 
-                                        new_allc->model->meshes[i].data.indices=temp_allc;
+                                        new_allc->model->meshes[i].indices=temp_allc;
 
 
                                         fseek(file,(temp_ushort&0x1)*2,SEEK_CUR);
@@ -465,16 +466,16 @@ void clear_asset(AST_Allocation *asset){
         if(asset->model->meshes){
             for (uint8_t i = 0; i < asset->model->mesh_count; i++)
             {
-                if(asset->model->meshes[i].data.vertices){
-                    free(asset->model->meshes[i].data.vertices);
+                if(asset->model->meshes[i].vertices){
+                    free(asset->model->meshes[i].vertices);
                 }
 
-                if(asset->model->meshes[i].data.normals){
-                    free(asset->model->meshes[i].data.normals);
+                if(asset->model->meshes[i].normals){
+                    free(asset->model->meshes[i].normals);
                 }
 
-                if(asset->model->meshes[i].data.indices){
-                    free(asset->model->meshes[i].data.indices);
+                if(asset->model->meshes[i].indices){
+                    free(asset->model->meshes[i].indices);
                 }
             }
             

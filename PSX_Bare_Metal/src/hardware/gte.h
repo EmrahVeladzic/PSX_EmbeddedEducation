@@ -87,6 +87,8 @@ typedef struct gte_msh_args{
     uint16_t *indices;
     uint16_t vertex_count;
     uint16_t triangle_count;
+    uint8_t material;
+    uint8_t bone_index;
 
 }MSH_ARGS;
 
@@ -98,6 +100,9 @@ typedef struct draw_ctx{
     uint32_t clut;          
     uint32_t tpage;         
 }DRAW_CTX;
+
+
+extern const uint16_t rsqrt_tab[257];
 
 void load_affine(const AFFINE *aff);
 
@@ -120,5 +125,11 @@ AFFINE create_set_affine(const TRANSFORM *transform);
 void set_screen_offset(int32_t ofx, int32_t ofy, uint16_t h, uint16_t zsf3);
 
 uint32_t *queue_mesh(const MSH_ARGS *mesh, const DRAW_CTX *ctx);
+
+VEC3 interpolate_vec3(const VEC3 *a, const VEC3 *b, uint16_t factor);
+
+SVEC3 interpolate_svec3(const SVEC3 *a, const SVEC3 *b, uint16_t factor);
+
+QUAT interpolate_quat(const QUAT *a, const QUAT *b, uint16_t factor);
 
 #endif

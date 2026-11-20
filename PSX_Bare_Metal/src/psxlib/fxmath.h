@@ -3,6 +3,10 @@
 
 #include <gte.h>
 
+
+extern const uint16_t recip[61];
+
+
 #define FIX_SHL(in,n) ((int32_t)(in)*(int32_t)(1<<(n)))
 #define FIX_SHR(in,n) ((int32_t)(in)>>(n))
 

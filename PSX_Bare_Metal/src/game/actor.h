@@ -1,20 +1,24 @@
-#ifndef ACTOR_T
-#define ACTOR_T
+#ifndef ACTOR_H
+#define ACTOR_H
 
+#include <stdint.h>
+#include <model.h>
+#include <texture.h>
+#include <gte.h>
 
-#include <scene.h>
+typedef struct w_actor{
+    
+    uint32_t type;
+    uint32_t state;
+    void (*tick)(struct w_actor *self, int last_frame); 
+    AST_Allocation *asset;
+    GPU_Allocation *texture;
+    ANIM_CONTROLLER *animation_controller;
+    TRANSFORM actor_transform;
+    bool animate;
+    uint8_t anim_select;
+    uint8_t relative_start_frame;
 
-typedef enum actor_type : uint32_t{
-    A_TYP_EMPTY = 0,
-    A_TYP_PLAYER = 1,
-    A_TYP_RAVEN = 2,
-    A_TYP_SKELETON = 3,
-    A_TYP_MINION = 4
-}ACTOR_TYPE;
-
-
-ACTOR *create_specific_actor(uint32_t type);
-
-
+}ACTOR;
 
 #endif

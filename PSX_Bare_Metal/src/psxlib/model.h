@@ -56,16 +56,11 @@ typedef struct rig{
 
 }RIG;
 
-typedef struct mesh{
 
-    MSH_ARGS data;
-    uint8_t bone_index;
-
-}MESH;
 
 typedef struct model{
 
-    MESH *meshes;
+    MSH_ARGS *meshes;
     RIG *skeletal_rig;
     uint8_t flag;
     uint8_t mesh_count;
@@ -80,10 +75,16 @@ typedef struct ast_mem {
     char *path;
 }AST_Allocation;
 
+typedef struct anim_ctrl
+{   
+    uint8_t t_current;
+    uint8_t r_current;
+    uint8_t s_current;
+}ANIM_CONTROLLER;
+
+
 AST_Allocation *load_asset(const char *path);
 
 void clear_asset(AST_Allocation *asset);
-
-
 
 #endif

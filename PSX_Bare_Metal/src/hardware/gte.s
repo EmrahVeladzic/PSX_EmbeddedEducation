@@ -7,14 +7,23 @@
 .globl multiply_with_current
 .globl set_screen_offset
 .globl queue_mesh
+.globl interpolate_vec3
+.globl interpolate_svec3
+.globl interpolate_quat
+
 .text
 
+.set RSQRT_SHIFT, 3
+.set RSQRT_COUNT, ((2048) >> RSQRT_SHIFT) + 1
 .set OT_SLOTS, 2048
 
 .set GTE_RT_IR,     0x049E012
 .set GTE_RT_IR_TR,  0x0498012
 .set GTE_RTPT,  0x0280030
 .set GTE_AVSZ3, 0x158002D
+.set GTE_NCLIP, 0x1400006
+.set GTE_INTPL, 0x0980011
+.set GTE_GPF,   0x0198003D
 
 load_transform:
 
@@ -365,6 +374,7 @@ queue_mesh:
     lw $t6, 12($a1) #color_cmd 
     lw $t7, 16($a1) #clut 
     lw $t8, 20($a1) #tpage 
+    lbu $a0, 16($a0) #material 
     
     srl $t9, $t6, 26
     lui $s0, 0x00FF
@@ -405,13 +415,29 @@ qm_loop:
     or   $a3, $a3, $t8 #tpage    
 
     addiu $t4, $t4, 6 #ind_bfr += 3   
+
+    andi $a0, $a0, 0x1 #culling_check 
+
+    bnez $a0, qm_draw
+
+    addiu $t0, $t0, -1 #triangle_done
+
+    cop2 GTE_NCLIP
+    mfc2 $v0, $24     
+
+    nop
+    bgez $v0, qm_next #culled
+    nop
+
+qm_draw:
+
  
     cop2 GTE_AVSZ3           
    
     mfc2 $s1, $7
-    addiu $t0, $t0, -1 #triangle_done
 
     beqz $s1, qm_next
+    nop
 
 
     sltiu $v0, $s1, OT_SLOTS
@@ -494,4 +520,208 @@ qm_done:
     addiu $sp, $sp, 16
 
 
+interpolate_vec3:
+
+    lwc2 $9, 0($a1)
+    lwc2 $10, 4($a1)
+    lwc2 $11, 8($a1)
+    mtc2 $a3, $8
+
+    lw  $t0, 0($a2)
+    lw  $t1, 4($a2)
+    lw  $t2, 8($a2)
+    ctc2 $t0, $21
+    ctc2 $t1, $22
+    ctc2 $t2, $23
+
+    nop 
+    nop
+
+    cop2 GTE_INTPL
+
+    swc2 $9,  0($a0)
+    swc2 $10, 4($a0)
+    swc2 $11, 8($a0)
+
+    jr $ra
+    move $v0, $a0
+
+
+interpolate_svec3:
+
+    lh   $t0, 0($a1)
+    lh   $t1, 2($a1)
+    lh   $t2, 4($a1)
+    mtc2 $t0, $9
+    mtc2 $t1, $10
+    mtc2 $t2, $11
+    mtc2 $a3, $8
+
+    lh  $t0, 0($a2)
+    lh  $t1, 2($a2)
+    lh  $t2, 4($a2)
+    ctc2 $t0, $21
+    ctc2 $t1, $22
+    ctc2 $t2, $23
+
+    nop
+    nop
+
+    cop2 GTE_INTPL
+
+    mfc2 $t0, $9
+    mfc2 $t1, $10
+    mfc2 $t2, $11
+
+    sh $t0, 0($a0)
+    sh $t1, 2($a0)
+    sh $t2, 4($a0)
+
+    jr $ra
+    move $v0, $a0
+
+
+
+interpolate_quat:
+ 
+    lh $t0, 0($a1) # ax
+    lh $t1, 2($a1) # ay
+    lh $t2, 4($a1) # az
+    lh $t3, 6($a1) # aw
+    lh $t4, 0($a2) # bx
+    lh $t5, 2($a2) # by
+    lh $t6, 4($a2) # bz
+    lh $t7, 6($a2) # bw
+
+
+    mult $t0, $t4
+    mflo $t8    #ax * bx
+    nop
+    nop
+
+    mult $t1, $t5
+    mflo $t9    #ay*by
+    nop
+    addu $t8, $t8, $t9
+
+    mult $t2, $t6
+    mflo $t9    #az*bz
+    nop
+    addu $t8, $t8, $t9
+
+    mult $t3, $t7
+    mflo $t9    #aw*bw
+    nop
+
+    addu $t8, $t8, $t9 #dot = (axbx) + (ayby) + (azbz) + (awbw)
+
+
+    
+    bgez $t8, q_no_flip #dot<0 => bx = -bx, by = -by, bz = -bz, bw = -bw
+    nop
+
+    subu $t4, $zero, $t4
+    subu $t5, $zero, $t5
+    subu $t6, $zero, $t6
+    subu $t7, $zero, $t7
+
+
+q_no_flip:
+
+    mtc2 $a3, $8 #factor
+
+    mtc2 $t0, $9    #ax
+    mtc2 $t1, $10   #ay
+    mtc2 $t2, $11   #az
+
+
+    ctc2 $t4, $21   #bx
+    ctc2 $t5, $22   #by
+    ctc2 $t6, $23   #bz
+
+    nop
+    nop
+
+    cop2 GTE_INTPL
+
+    subu $t9, $t7, $t3 #bw - aw
+    mult $t9, $a3 
+    mflo $t9 
+    sra  $t9, 12 # (bw-aw)*factor
+    addu $t3, $t3, $t9 # q = aw + (bw-aw) * factor
+
+    mfc2 $t0, $9  
+    mfc2 $t1, $10 
+    mfc2 $t2, $11 
+
+    mult $t0, $t0
+    mflo $t8                    
+    nop
+    nop
+    mult $t1, $t1
+    mflo $t9                    
+    nop
+    addu $t8, $t8, $t9
+    mult $t2, $t2
+    mflo $t9                   
+    nop
+    addu $t8, $t8, $t9
+    mult $t3, $t3
+    mflo $t9            
+    nop
+
+    addu $t8, $t8, $t9
+    sra  $t8, $t8, 12   #n2 = |q|^2 = x^2 + y^2 + z^2 + w^2
+
+
+    addiu $t8, $t8, -2048
+    sra   $t8, $t8, RSQRT_SHIFT  #reciprocal square root index
+
+    bgez $t8, q_upper_clamp
+
+    li   $t9, RSQRT_COUNT
+    move $t8, $zero #low_clamp
+
+
+q_upper_clamp:
+
+    sltu  $t9, $t8, $t9          
+    bnez  $t9, q_clamped          
+    nop                          
+    li    $t8, RSQRT_COUNT - 1 #high_clamp 
+
+
+q_clamped:
+
+    sll $t8, $t8, 1 #offset
+    la $t9, rsqrt_tab #inverse square root table
+    addu $t9, $t9, $t8 #table[offset]
+
+    lhu $t9, 0($t9) #1 / sqrt(n2)
+    nop
+
+    mtc2 $t9, $8
+    mult $t3, $t9 #norm_w
+    nop
+
+    cop2 GTE_GPF #norm_xyz
+
+    mflo $t3
+    sra  $t3, $t3, 12 #normalized
+
+    mfc2 $t0, $9
+    mfc2 $t1, $10
+    mfc2 $t2, $11
+
+
+    sh  $t3, 6($a0)
+    sh  $t0, 0($a0)
+    sh  $t1, 2($a0)
+    sh  $t2, 4($a0) 
+
+
+ 
+    jr   $ra
+    move $v0, $a0
+ 
 
